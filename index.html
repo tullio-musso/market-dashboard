@@ -3,201 +3,278 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>INVESTA | Market Dashboard</title>
+<title>INVESTA | Morning Brief</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
 :root {
-  --bg: #060a0f; --bg2: #0b1119; --bg3: #101620;
-  --border: #18222e; --border2: #1f2d3d;
-  --amber: #f0a500; --amber2: #c27f00;
-  --green: #00b87a; --red: #e8334a;
-  --blue: #3d8ef5; --purple: #8b6cf7;
-  --text: #8fa3b8; --text2: #c8d8e8; --text3: #e8f2fa;
-  --mono: 'IBM Plex Mono', monospace;
-  --sans: 'IBM Plex Sans', sans-serif;
+  --bg:#060a0f; --bg2:#0b1119; --bg3:#101620;
+  --border:#18222e; --border2:#1f2d3d;
+  --amber:#f0a500; --amber2:#c27f00;
+  --green:#00b87a; --red:#e8334a;
+  --blue:#3d8ef5; --purple:#8b6cf7;
+  --text:#8fa3b8; --text2:#c8d8e8; --text3:#e8f2fa;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { font-size: 12px; }
-body { background: var(--bg); color: var(--text); font-family: var(--mono); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+*{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:12px;}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 
-/* === HEADER === */
-#hdr {
-  background: var(--bg2); border-bottom: 1px solid var(--border2);
-  height: 48px; display: flex; align-items: center; padding: 0 16px;
-  gap: 12px; position: sticky; top: 0; z-index: 200;
+/* ── HEADER ── */
+#hdr{
+  background:var(--bg2);border-bottom:1px solid var(--border2);
+  height:48px;display:flex;align-items:center;padding:0 16px;
+  gap:0;flex-shrink:0;z-index:200;
 }
-.logo { font-size: 11px; font-weight: 700; letter-spacing: 4px; color: var(--amber); }
-.hdiv { width: 1px; height: 20px; background: var(--border2); }
-.htag { font-size: 8.5px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--text); }
-#clk { font-size: 11px; color: var(--text3); letter-spacing: 0.5px; }
-.dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); animation: blink 2s infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
-#status { margin-left: auto; font-size: 9px; color: var(--text); letter-spacing: 0.5px; }
-.hbtn {
-  background: transparent; border: 1px solid var(--border2);
-  color: var(--text); font-family: var(--mono); font-size: 8.5px;
-  letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 12px;
-  cursor: pointer; transition: all .15s; border-radius: 2px;
-}
-.hbtn:hover { border-color: var(--amber); color: var(--amber); }
-.hbtn:disabled { opacity: .35; cursor: not-allowed; }
+.logo{font-size:11px;font-weight:700;letter-spacing:4px;color:var(--amber);flex-shrink:0;}
+.hdiv{width:1px;height:20px;background:var(--border2);margin:0 12px;flex-shrink:0;}
+#clk{font-size:11px;color:var(--text3);letter-spacing:0.5px;flex-shrink:0;}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--amber);animation:blink 2s infinite;flex-shrink:0;margin:0 8px;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 
-/* === TABS === */
-#tabs {
-  background: var(--bg2); border-bottom: 1px solid var(--border);
-  display: flex; padding: 0 16px; flex-shrink: 0;
+/* ── TABS IN HEADER ── */
+#nav-tabs{
+  display:flex;align-items:stretch;height:100%;margin-left:4px;flex:1;
 }
-.tab {
-  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
-  padding: 10px 16px; cursor: pointer; color: var(--text);
-  border-bottom: 2px solid transparent; transition: all .15s;
+.ntab{
+  font-size:8.5px;letter-spacing:1.8px;text-transform:uppercase;
+  padding:0 16px;cursor:pointer;color:var(--text);
+  border-bottom:2px solid transparent;border-top:2px solid transparent;
+  transition:all .15s;display:flex;align-items:center;gap:5px;
+  white-space:nowrap;flex-shrink:0;
 }
-.tab:hover { color: var(--text2); }
-.tab.active { color: var(--amber); border-bottom-color: var(--amber); }
+.ntab:hover{color:var(--text2);}
+.ntab.active{color:var(--amber);border-bottom-color:var(--amber);}
 
-/* === TICKER === */
-#ticker {
-  height: 27px; background: var(--bg3); border-bottom: 1px solid var(--border);
-  display: flex; overflow: hidden; align-items: center; flex-shrink: 0;
+/* ── LANG TOGGLE ── */
+#lang-wrap{margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;}
+#stxt{font-size:8.5px;color:var(--text);letter-spacing:0.5px;}
+.lbtn{
+  background:transparent;border:1px solid var(--border2);
+  color:var(--text);font-family:var(--mono);font-size:8px;
+  letter-spacing:1.5px;text-transform:uppercase;padding:4px 9px;
+  cursor:pointer;transition:all .15s;border-radius:2px;
 }
-#tbadge {
-  background: var(--amber); color: #000; font-size: 7.5px; font-weight: 700;
-  letter-spacing: 2.5px; padding: 0 10px; height: 100%; display: flex;
-  align-items: center; flex-shrink: 0; text-transform: uppercase;
-}
-.tscroll { overflow: hidden; flex: 1; }
-#tinner { display: flex; white-space: nowrap; animation: scroll 80s linear infinite; }
-.ti { display: inline-flex; gap: 5px; padding: 0 16px; border-right: 1px solid var(--border); font-size: 10px; align-items: center; }
-.tiname { color: var(--text); }
-.tiprice { color: var(--text3); }
-@keyframes scroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+.lbtn.active,.lbtn:hover{border-color:var(--amber);color:var(--amber);}
 
-/* === PAGES === */
-#content { flex: 1; overflow-y: auto; overflow-x: hidden; }
-.page { display: none; }
-.page.on { display: block; }
+/* ── TICKER ── */
+#ticker{
+  height:27px;background:var(--bg3);border-bottom:1px solid var(--border);
+  display:flex;overflow:hidden;align-items:center;flex-shrink:0;
+  transition:height .2s,opacity .2s;
+}
+#ticker.hidden{height:0;opacity:0;pointer-events:none;}
+#tbadge{
+  background:var(--amber);color:#000;font-size:7.5px;font-weight:700;
+  letter-spacing:2.5px;padding:0 10px;height:100%;display:flex;
+  align-items:center;flex-shrink:0;text-transform:uppercase;
+}
+.tscroll{overflow:hidden;flex:1;}
+#tinner{display:flex;white-space:nowrap;animation:scroll 80s linear infinite;}
+.ti{display:inline-flex;gap:5px;padding:0 16px;border-right:1px solid var(--border);font-size:10px;align-items:center;}
+.tiname{color:var(--text);}
+.tiprice{color:var(--text3);}
+@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
-/* === PRICES PAGE === */
-#pg-prices { padding: 10px 14px 24px; display: flex; flex-direction: column; gap: 8px; }
-.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-@media(max-width:960px) { .row2 { grid-template-columns: 1fr; } }
-.blk { display: flex; flex-direction: column; gap: 5px; }
-.blk-title {
-  font-size: 8px; letter-spacing: 2.5px; text-transform: uppercase;
-  color: var(--amber); display: flex; align-items: center; gap: 8px;
-}
-.blk-title::after { content:''; flex:1; height:1px; background: linear-gradient(90deg, var(--border2), transparent); }
-.tag { display: inline-block; font-size: 7px; padding: 1px 5px; border: 1px solid var(--border2); color: var(--text); border-radius: 2px; margin-left: 4px; }
-table { width: 100%; border-collapse: collapse; background: var(--bg2); border: 1px solid var(--border); font-size: 10.5px; }
-thead tr { background: #080e15; }
-th { font-size: 8px; letter-spacing: 1px; text-transform: uppercase; font-weight: 400; color: var(--text); padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--border2); white-space: nowrap; }
-th:first-child { text-align: left; }
-td { padding: 4px 8px; text-align: right; border-bottom: 1px solid var(--border); color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; }
-td:first-child { text-align: left; color: var(--text3); font-weight: 500; }
-td.unit { font-size: 8px; color: var(--text); padding: 0 2px; }
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: rgba(255,255,255,.02); }
-.g { color: var(--green) !important; }
-.r { color: var(--red) !important; }
-.d { color: var(--text) !important; }
-@keyframes flash { 0%{background:rgba(240,165,0,.12)} 100%{background:transparent} }
-.fl { animation: flash .5s ease; }
+/* ── SCROLLABLE CONTENT ── */
+#content{flex:1;overflow-y:auto;overflow-x:hidden;}
+.page{display:none;}
+.page.on{display:block;}
 
-/* === NEWS PAGE === */
-#pg-news { padding: 12px 14px 30px; }
-.morning-brief {
-  background: var(--bg2); border: 1px solid var(--border2);
-  border-left: 3px solid var(--amber); padding: 14px 16px;
-  margin-bottom: 12px; font-family: var(--sans); font-size: 11px;
-  line-height: 1.75; color: var(--text2);
+/* ── UTILITY ── */
+.g{color:var(--green);}.r{color:var(--red);}.d{color:var(--text);}
+.blk{background:var(--bg2);border:1px solid var(--border);padding:0;}
+.blk-title{
+  font-size:8px;letter-spacing:2px;text-transform:uppercase;
+  padding:8px 12px;border-bottom:1px solid var(--border);
+  color:var(--text);display:flex;align-items:center;gap:6px;
 }
-.morning-brief strong { color: var(--text3); }
-.morning-brief .meta { font-family: var(--mono); font-size: 8.5px; color: var(--text); letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase; }
+.tag{font-size:7px;letter-spacing:1px;border:1px solid var(--border2);padding:1px 5px;color:var(--text);border-radius:1px;}
+table{width:100%;border-collapse:collapse;}
+th{font-size:7.5px;letter-spacing:1px;text-transform:uppercase;color:var(--text);padding:5px 10px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap;}
+th:first-child{text-align:left;}
+td{font-size:10.5px;padding:4px 10px;text-align:right;border-bottom:1px solid var(--border);font-variant-numeric:tabular-nums;}
+td:first-child{text-align:left;color:var(--text2);}
+.unit{font-size:8px;color:var(--text);text-align:left!important;}
+tr.fl:last-child td{border-bottom:none;}
+tr.fl:hover td{background:var(--bg3);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+@media(max-width:800px){.row2{grid-template-columns:1fr;}}
 
-.section { margin-bottom: 14px; }
-.section-hdr {
-  font-size: 8px; letter-spacing: 2.5px; text-transform: uppercase;
-  color: var(--amber); display: flex; align-items: center; gap: 8px; margin-bottom: 7px;
-}
-.section-hdr::after { content:''; flex:1; height:1px; background: linear-gradient(90deg, var(--border2), transparent); }
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 7px; }
-.card {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-left: 2px solid var(--border2); padding: 11px 13px;
-  display: flex; flex-direction: column; gap: 6px; transition: border-color .15s;
-}
-.card:hover { border-left-color: var(--amber); }
-.card.eq  { border-left-color: #3d8ef5; }
-.card.rates { border-left-color: #8b6cf7; }
-.card.fx   { border-left-color: #00b87a; }
-.card.oil  { border-left-color: #f0a500; }
-.card.gold { border-left-color: #e8d44d; }
-.card.macro{ border-left-color: #3a4a5a; }
-.card.credit{border-left-color: #e8334a; }
-.card-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.ctag {
-  font-size: 7px; letter-spacing: 1px; text-transform: uppercase;
-  padding: 2px 6px; border-radius: 2px; font-weight: 600; font-family: var(--mono);
-}
-.ctag.eq    { background: #0b1f38; color: #3d8ef5; }
-.ctag.rates { background: #150e30; color: #8b6cf7; }
-.ctag.fx    { background: #012e1e; color: #00b87a; }
-.ctag.oil   { background: #2e1a00; color: #f0a500; }
-.ctag.gold  { background: #2a2200; color: #e8d44d; }
-.ctag.macro { background: #0e1820; color: var(--text2); }
-.ctag.credit{ background: #2a0812; color: #e8334a; }
-.csrc { font-size: 8.5px; color: var(--text); font-family: var(--mono); }
-.cdate { font-size: 8px; color: var(--text); font-family: var(--mono); margin-left: auto; }
-.cheadline { font-family: var(--sans); font-size: 11.5px; font-weight: 500; color: var(--text3); line-height: 1.4; }
-.cheadline a { color: inherit; text-decoration: none; }
-.cheadline a:hover { color: var(--amber); }
-.cbody { font-family: var(--sans); font-size: 10.5px; color: var(--text2); line-height: 1.6; }
-.clink { font-size: 9px; color: var(--blue); text-decoration: none; font-family: var(--mono); }
-.clink:hover { color: var(--amber); }
-.news-footer { font-size: 8.5px; color: var(--text); text-align: right; margin-top: 8px; font-family: var(--mono); }
+/* ── PRICES PAGE ── */
+#pg-prices{padding:10px 14px 24px;flex-direction:column;gap:8px;}
+#pg-prices.on{display:flex;}
 
-/* === FOOTER === */
-#ftr {
-  background: var(--bg2); border-top: 1px solid var(--border);
-  padding: 7px 16px; display: flex; justify-content: space-between;
-  font-size: 8px; color: var(--text); flex-wrap: wrap; gap: 4px;
+/* ── NEWS PAGE ── */
+.morning-brief{
+  font-family:var(--sans);font-size:10.5px;color:var(--text2);
+  border-left:2px solid var(--amber);padding:10px 14px;
+  background:var(--bg2);line-height:1.6;margin-bottom:12px;
+}
+.meta{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);margin-bottom:6px;font-family:var(--mono);}
+.section{margin-bottom:14px;}
+.section-hdr{
+  font-size:7.5px;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--amber);display:flex;align-items:center;gap:8px;margin-bottom:7px;
+}
+.section-hdr::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent);}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:7px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-left:2px solid var(--border2);padding:10px 12px;display:flex;flex-direction:column;gap:6px;}
+.card.eq{border-left-color:#3d8ef5;}.card.rates{border-left-color:#8b6cf7;}
+.card.oil{border-left-color:#f0a500;}.card.gold{border-left-color:#e8d44d;}
+.card.macro{border-left-color:#00b87a;}.card.credit{border-left-color:#e8334a;}
+.card.fx{border-left-color:#5ac8fa;}
+.card-top{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.ctag{font-size:7px;letter-spacing:.8px;text-transform:uppercase;padding:1.5px 5px;border-radius:2px;font-weight:600;font-family:var(--mono);}
+.ctag.eq{background:#071428;color:#3d8ef5;}.ctag.rates{background:#1e0a30;color:#8b6cf7;}
+.ctag.oil{background:#2e1a00;color:#f0a500;}.ctag.gold{background:#2a2200;color:#e8d44d;}
+.ctag.macro{background:#012e1e;color:#00b87a;}.ctag.credit{background:#2a0818;color:#e8334a;}
+.ctag.fx{background:#001a2e;color:#5ac8fa;}
+.csrc{font-size:7.5px;color:var(--text);font-family:var(--mono);margin-left:auto;}
+.cdate{font-size:7px;color:var(--text);}
+.cheadline a{font-size:10.5px;font-weight:600;color:var(--text3);font-family:var(--sans);text-decoration:none;line-height:1.4;}
+.cheadline a:hover{color:var(--amber);}
+.cbody{font-family:var(--sans);font-size:10px;color:var(--text2);line-height:1.55;}
+.clink{font-size:8.5px;color:var(--blue);text-decoration:none;font-family:var(--mono);display:inline-flex;align-items:center;gap:3px;}
+.clink:hover{color:var(--amber);}
+.clink::before{content:'↗';font-size:9px;}
+.news-footer{font-size:8px;color:var(--text);text-align:right;margin-top:8px;font-family:var(--mono);}
+
+/* ── PORTFOLIO PAGE ── */
+.pcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:7px;margin-bottom:4px;}
+.pcard{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--border2);padding:11px 12px 10px;display:flex;flex-direction:column;gap:8px;transition:border-left-color .15s,box-shadow .15s;}
+.pcard:hover{box-shadow:0 2px 16px rgba(0,0,0,.25);}
+.pcard.sai{border-left-color:#3d8ef5;}.pcard.sfin{border-left-color:#00b87a;}
+.pcard.sbio{border-left-color:#ff6b8a;}.pcard.sind{border-left-color:#ffb347;}
+.pcard.sdeep{border-left-color:#c084fc;}.pcard.snrg{border-left-color:#f0a500;}
+.pcard.sre{border-left-color:#e8d44d;}.pcard.shlth{border-left-color:#5ac8fa;}
+.pcard.sagri{border-left-color:#4cd9a0;}.pcard.sclim{border-left-color:#6ee7b7;}
+.pcard.scon{border-left-color:#fb923c;}.pcard.secom{border-left-color:#a78bfa;}
+.pcard.sspc{border-left-color:#38bdf8;}.pcard.sit{border-left-color:#e879f9;}
+.pcard-head{display:flex;align-items:center;gap:9px;}
+.plogo{width:32px;height:32px;flex-shrink:0;background:var(--bg3);border:1px solid var(--border2);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;}
+.plogo img{width:100%;height:100%;object-fit:contain;border-radius:4px;}
+.pname-col{flex:1;min-width:0;}
+.pname{font-size:11.5px;font-weight:600;color:var(--text3);font-family:var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pname a{color:inherit;text-decoration:none;}.pname a:hover{color:var(--amber);}
+.pbadges{display:flex;align-items:center;gap:4px;margin-top:3px;flex-wrap:wrap;}
+.pbadge{font-size:7px;letter-spacing:.8px;text-transform:uppercase;padding:1.5px 5px;border-radius:2px;font-weight:600;font-family:var(--mono);border:1px solid transparent;white-space:nowrap;}
+.pbadge.stage{border-color:var(--border2);color:var(--text2);}
+.pbadge.sai{background:#071428;color:#3d8ef5;}.pbadge.sfin{background:#011c11;color:#00b87a;}
+.pbadge.sbio{background:#200612;color:#ff6b8a;}.pbadge.sind{background:#201100;color:#ffb347;}
+.pbadge.sdeep{background:#160722;color:#c084fc;}.pbadge.snrg{background:#221100;color:#f0a500;}
+.pbadge.sre{background:#1c1800;color:#e8d44d;}.pbadge.shlth{background:#001220;color:#5ac8fa;}
+.pbadge.sagri{background:#011c12;color:#4cd9a0;}.pbadge.sclim{background:#011c14;color:#6ee7b7;}
+.pbadge.scon{background:#200c00;color:#fb923c;}.pbadge.secom{background:#110622;color:#a78bfa;}
+.pbadge.sspc{background:#001220;color:#38bdf8;}.pbadge.sit{background:#1a0420;color:#e879f9;}
+.pmets{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;}
+.pmet{background:var(--bg3);border:1px solid var(--border);padding:4px 6px;border-radius:2px;}
+.pmet-l{font-size:6.5px;letter-spacing:1px;text-transform:uppercase;color:var(--text);font-family:var(--mono);margin-bottom:2px;}
+.pmet-v{font-size:10px;font-weight:600;color:var(--text3);font-family:var(--mono);font-variant-numeric:tabular-nums;}
+.pmet-v.nd{font-size:8.5px;color:var(--text);font-weight:400;font-style:italic;}
+.pdesc{font-size:9.5px;color:var(--text2);font-family:var(--sans);line-height:1.55;}
+.pnews{display:flex;flex-direction:column;gap:3px;padding-top:1px;}
+.pnews-row{display:flex;align-items:flex-start;gap:5px;font-size:8.5px;font-family:var(--sans);}
+.pnews-dot{width:3px;height:3px;min-width:3px;border-radius:50%;background:var(--border2);margin-top:4.5px;}
+.pnews-row a{color:var(--text);text-decoration:none;line-height:1.45;flex:1;transition:color .12s;}
+.pnews-row a:hover{color:var(--amber);}
+.psrc{color:var(--text);font-family:var(--mono);font-size:7px;padding:1px 3px;border:1px solid var(--border);border-radius:2px;white-space:nowrap;flex-shrink:0;margin-left:3px;align-self:flex-start;margin-top:1px;}
+.pnote{color:var(--text);font-size:8.5px;font-style:italic;}
+.psec-hdr{font-size:7.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--amber);display:flex;align-items:center;gap:8px;margin:14px 0 6px;padding-top:4px;}
+.psec-hdr::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border2) 0%,transparent 100%);}
+.p-brief{font-family:var(--sans);font-size:10.5px;color:var(--text2);border-left:2px solid #8b6cf7;padding:10px 14px;background:var(--bg2);line-height:1.6;margin-bottom:14px;}
+.p-brief .meta{font-family:var(--mono);font-size:8px;color:var(--text);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;}
+.pdisclaim{margin-top:16px;padding:9px 12px;background:var(--bg2);border:1px solid var(--border);border-left:2px solid var(--border2);font-size:8px;color:var(--text);font-family:var(--mono);line-height:1.7;}
+
+/* ── OPPORTUNITIES PAGE ── */
+.opp-brief{font-family:var(--sans);font-size:10.5px;color:var(--text2);border-left:2px solid var(--green);padding:10px 14px;background:var(--bg2);line-height:1.6;margin-bottom:14px;}
+.opp-brief .meta{font-family:var(--mono);font-size:8px;color:var(--text);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;}
+.opp-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:7px;}
+.opp-card{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--green);padding:12px 13px;display:flex;flex-direction:column;gap:8px;transition:box-shadow .15s;}
+.opp-card:hover{box-shadow:0 2px 16px rgba(0,0,0,.25);}
+.opp-head{display:flex;align-items:center;gap:9px;}
+.opp-logo{width:32px;height:32px;flex-shrink:0;background:var(--bg3);border:1px solid var(--border2);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;}
+.opp-logo img{width:100%;height:100%;object-fit:contain;border-radius:4px;}
+.opp-name{font-size:12px;font-weight:600;color:var(--text3);font-family:var(--sans);}
+.opp-name a{color:inherit;text-decoration:none;}.opp-name a:hover{color:var(--amber);}
+.opp-badges{display:flex;gap:4px;margin-top:3px;flex-wrap:wrap;}
+.opp-badge{font-size:7px;letter-spacing:.8px;text-transform:uppercase;padding:1.5px 5px;border-radius:2px;font-family:var(--mono);border:1px solid var(--border2);color:var(--text2);}
+.opp-badge.status-open{border-color:var(--green);color:var(--green);background:rgba(0,184,122,.08);}
+.opp-badge.status-final{border-color:var(--amber);color:var(--amber);background:rgba(240,165,0,.08);}
+.opp-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;}
+.opp-met{background:var(--bg3);border:1px solid var(--border);padding:4px 6px;border-radius:2px;}
+.opp-met-l{font-size:6.5px;letter-spacing:1px;text-transform:uppercase;color:var(--text);font-family:var(--mono);margin-bottom:2px;}
+.opp-met-v{font-size:10px;font-weight:600;color:var(--text3);font-family:var(--mono);}
+.opp-met-v.nd{font-size:8.5px;color:var(--text);font-weight:400;font-style:italic;}
+.opp-desc{font-size:9.5px;color:var(--text2);font-family:var(--sans);line-height:1.55;}
+.opp-news{display:flex;flex-direction:column;gap:3px;}
+.opp-news-row{display:flex;align-items:flex-start;gap:5px;font-size:8.5px;}
+.opp-news-dot{width:3px;height:3px;min-width:3px;border-radius:50%;background:var(--green);margin-top:4.5px;opacity:.5;}
+.opp-news-row a{color:var(--text);text-decoration:none;line-height:1.45;flex:1;}
+.opp-news-row a:hover{color:var(--amber);}
+.opp-src{color:var(--text);font-family:var(--mono);font-size:7px;padding:1px 3px;border:1px solid var(--border);border-radius:2px;white-space:nowrap;flex-shrink:0;margin-left:3px;}
+.opp-loading{padding:40px;text-align:center;font-size:10px;color:var(--text);font-family:var(--mono);letter-spacing:1px;}
+.opp-err{padding:20px;font-size:9.5px;color:var(--red);font-family:var(--mono);background:var(--bg2);border:1px solid var(--border);border-left:2px solid var(--red);}
+.opp-sec-hdr{font-size:7.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--green);display:flex;align-items:center;gap:8px;margin:14px 0 6px;}
+.opp-sec-hdr::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent);}
+.opp-disclaimer{margin-top:16px;padding:9px 12px;background:var(--bg2);border:1px solid var(--border);border-left:2px solid var(--border2);font-size:8px;color:var(--text);font-family:var(--mono);line-height:1.7;}
+
+/* ── FOOTER ── */
+#ftr{
+  background:var(--bg2);border-top:1px solid var(--border);
+  padding:7px 16px;display:flex;justify-content:space-between;
+  font-size:8px;color:var(--text);flex-wrap:wrap;gap:4px;flex-shrink:0;
 }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
+<!-- HEADER with inline tabs -->
 <div id="hdr">
   <div class="logo">INVESTA</div>
   <div class="hdiv"></div>
-  <div class="htag">Morning Brief</div>
-  <div class="dot"></div>
-  <span id="clk"></span>
-  <div id="status">
+
+  <!-- TABS IN HEADER -->
+  <div id="nav-tabs">
+    <div class="ntab active" id="tab-prices" onclick="go('prices',this)">
+      <span>📊</span><span data-i18n="tab_markets">Markets</span>
+    </div>
+    <div class="ntab" id="tab-news" onclick="go('news',this)">
+      <span>📰</span><span data-i18n="tab_news">News</span>
+    </div>
+    <div class="ntab" id="tab-portfolio" onclick="go('portfolio',this)">
+      <span>🏦</span><span data-i18n="tab_portfolio">Portfolio</span>
+    </div>
+    <div class="ntab" id="tab-opportunities" onclick="go('opportunities',this)">
+      <span>🔭</span><span data-i18n="tab_opps">Opportunities</span>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE: clock + lang -->
+  <div id="lang-wrap">
+    <div class="dot"></div>
+    <span id="clk"></span>
+    <div class="hdiv"></div>
     <span id="stxt">EOD · Sat 28 Mar 2026</span>
+    <div class="hdiv"></div>
+    <button class="lbtn active" id="btn-en" onclick="setLang('en')">EN</button>
+    <button class="lbtn" id="btn-it" onclick="setLang('it')">IT</button>
   </div>
 </div>
 
-<!-- TABS -->
-<div id="tabs">
-  <div class="tab active" onclick="go('prices',this)">📊 &nbsp;Prices</div>
-  <div class="tab" onclick="go('news',this)">📰 &nbsp;News &amp; Commentary</div>
-  <div class="tab" onclick="go('portfolio',this)">🏦 &nbsp;Portfolio</div>
-</div>
-
-<!-- TICKER -->
+<!-- TICKER (prices tab only) -->
 <div id="ticker">
   <div id="tbadge">EOD</div>
   <div class="tscroll"><div id="tinner"></div></div>
 </div>
 
-<!-- ═══════════════════ SCROLLABLE CONTENT ═══════════════════ -->
+<!-- SCROLLABLE CONTENT -->
 <div id="content">
 
 <!-- ═══════════════════ PAGE 1 — PRICES ═══════════════════ -->
 <div class="page on" id="pg-prices">
 
-  <div id="pg-prices-inner" style="padding:10px 14px 24px;display:flex;flex-direction:column;gap:8px;">
+  <div id="pg-prices-inner" style="padding:10px 14px 24px;flex-direction:column;gap:8px;display:flex;">
 
     <!-- EQUITIES -->
     <div class="blk">
@@ -248,7 +325,6 @@ tr:hover td { background: rgba(255,255,255,.02); }
 
   </div>
 </div>
-
 <!-- ═══════════════════ PAGE 2 — NEWS ═══════════════════ -->
 <div class="page" id="pg-news">
 <div id="pg-news-inner" style="padding:12px 14px 30px;">
@@ -261,7 +337,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
 
   <!-- EQUITIES -->
   <div class="section">
-    <div class="section-hdr">Equities</div>
+    <div class="section-hdr" data-sect="sect_equities"><span>Equities</span></div>
     <div class="cards">
 
       <div class="card eq">
@@ -313,7 +389,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
 
   <!-- RATES -->
   <div class="section">
-    <div class="section-hdr">Rates &amp; Fixed Income</div>
+    <div class="section-hdr" data-sect="sect_rates"><span>Rates &amp; Fixed Income</span></div>
     <div class="cards">
 
       <div class="card rates">
@@ -469,7 +545,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
 
   <!-- MACRO / GEOPOLITICS -->
   <div class="section">
-    <div class="section-hdr">Macro &amp; Geopolitics</div>
+    <div class="section-hdr" data-sect="sect_macro"><span>Macro &amp; Geopolitics</span></div>
     <div class="cards">
 
       <div class="card macro">
@@ -512,8 +588,6 @@ tr:hover td { background: rgba(255,255,255,.02); }
 
 </div>
 </div>
-
-
 <!-- ═══════════════════ PAGE 3 — PORTFOLIO ═══════════════════ -->
 <div class="page" id="pg-portfolio">
 <div style="padding:12px 14px 30px;">
@@ -650,11 +724,11 @@ tr:hover td { background: rgba(255,255,255,.02); }
 
 <div class="p-brief">
   <div class="meta">📁 Investa Solutions SA &nbsp;·&nbsp; Private Markets Portfolio &nbsp;·&nbsp; 24 Positions &nbsp;·&nbsp; As of 29 Mar 2026</div>
-  Direct investments across AI, fintech, biotech, industrial, energy, healthcare, real estate, climate and space. Valuations sourced from latest confirmed funding rounds or secondary transactions as reported in public media. Companies without public disclosures are flagged. Not investment advice.
+  <span data-i18n="port_intro">Direct investments across AI, fintech, biotech, industrial, energy, healthcare, real estate, climate and space. Valuations sourced from latest confirmed funding rounds or secondary transactions as reported in public media. Companies without public disclosures are flagged. Not investment advice.
 </div>
 
 <!-- ─── AI / SaaS ─── -->
-<div class="psec-hdr">🤖 AI &amp; SaaS</div>
+<div class="psec-hdr" data-sect="sect_ai"><span>🤖 AI &amp; SaaS</span></div>
 <div class="pcards">
 
   <!-- Anthropic (tranche 1) -->
@@ -740,7 +814,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
 </div>
 
 <!-- ─── FinTech ─── -->
-<div class="psec-hdr">💳 FinTech</div>
+<div class="psec-hdr" data-sect="sect_fin"><span>💳 FinTech</span></div>
 <div class="pcards">
 
   <!-- Klarna -->
@@ -807,7 +881,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
 </div>
 
 <!-- ─── BioTech ─── -->
-<div class="psec-hdr">🧬 BioTech</div>
+<div class="psec-hdr" data-sect="sect_bio"><span>🧬 BioTech</span></div>
 <div class="pcards">
 
   <!-- Altheia Tranche 1 -->
@@ -913,7 +987,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
 </div>
 
 <!-- ─── Industrial ─── -->
-<div class="psec-hdr">🏭 Industrial</div>
+<div class="psec-hdr" data-sect="sect_ind"><span>🏭 Industrial</span></div>
 <div class="pcards">
 
   <!-- Rise -->
@@ -959,7 +1033,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
 </div>
 
 <!-- ─── Energy ─── -->
-<div class="psec-hdr">⚛️ Energy</div>
+<div class="psec-hdr" data-sect="sect_nrg"><span>⚛️ Energy</span></div>
 <div class="pcards">
 
   <!-- Newcleo -->
@@ -1005,7 +1079,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
 </div>
 
 <!-- ─── Deep Tech / IT ─── -->
-<div class="psec-hdr">🔬 Deep Tech &amp; IT</div>
+<div class="psec-hdr" data-sect="sect_deep"><span>🔬 Deep Tech &amp; IT</span></div>
 <div class="pcards">
 
   <!-- V-Nova -->
@@ -1051,7 +1125,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
 </div>
 
 <!-- ─── Real Estate ─── -->
-<div class="psec-hdr">🏟️ Real Estate</div>
+<div class="psec-hdr" data-sect="sect_re"><span>🏟️ Real Estate</span></div>
 <div class="pcards">
 
   <!-- Leipzig Stadium -->
@@ -1077,7 +1151,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
 </div>
 
 <!-- ─── Consumer & E-Commerce ─── -->
-<div class="psec-hdr">🛍️ Consumer &amp; E-Commerce</div>
+<div class="psec-hdr" data-sect="sect_con"><span>🛍️ Consumer &amp; E-Commerce</span></div>
 <div class="pcards">
 
   <!-- Project Marie -->
@@ -1144,7 +1218,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
 </div>
 
 <!-- ─── Agriculture ─── -->
-<div class="psec-hdr">🌾 Agriculture</div>
+<div class="psec-hdr" data-sect="sect_agri"><span>🌾 Agriculture</span></div>
 <div class="pcards">
 
   <!-- Fyeld (Pomos) -->
@@ -1170,7 +1244,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
 </div>
 
 <!-- ─── Space ─── -->
-<div class="psec-hdr">🚀 Space</div>
+<div class="psec-hdr" data-sect="sect_spc"><span>🚀 Space</span></div>
 <div class="pcards">
 
   <!-- SpaceX -->
@@ -1196,25 +1270,221 @@ tr:hover td { background: rgba(255,255,255,.02); }
 </div>
 
 <div class="pdisclaim">
-  ⚠️ &nbsp;VALUATIONS are last-known private market figures sourced from public media reports of confirmed funding rounds or secondary transactions. They do not represent fair value, offer price, or Investa's internal carrying value. Klarna is now listed on NYSE (KLAR) — see public markets for live pricing. Companies marked "Not public" are early-stage with no published valuation data. This page is for internal reference only and does not constitute investment advice.
+  <span data-i18n="disclaim">⚠️ &nbsp;VALUATIONS are last-known private market figures sourced from public media reports of confirmed funding rounds or secondary transactions. They do not represent fair value, offer price, or Investa's internal carrying value. Klarna is now listed on NYSE (KLAR) — see public markets for live pricing. Companies marked "Not public" are early-stage with no published valuation data. This page is for internal reference only and does not constitute investment advice.
 </div>
 
 </div>
 </div>
 <!-- END PORTFOLIO PAGE -->
 
+<!-- ═══════════════════ PAGE 4 — OPPORTUNITIES ═══════════════════ -->
+<div class="page" id="pg-opportunities">
+<div style="padding:12px 14px 30px;">
+
+  <div class="opp-brief">
+    <div class="meta" data-i18n="opp_meta">🔭 Investa Solutions SA &nbsp;·&nbsp; Live Deal Pipeline &nbsp;·&nbsp; Public Teasers Only</div>
+    <span data-i18n="opp_intro">Active co-investment opportunities currently in placement. All information shown is publicly available. For full deal documentation, term sheets, and access to data rooms, contact Investa directly. Valuations and terms are indicative only.</span>
+  </div>
+
+  <div id="opp-content">
+    <div class="opp-loading" data-i18n="opp_loading">⟳ &nbsp; Loading opportunities from Airtable…</div>
+  </div>
+
+  <div class="opp-disclaimer" data-i18n="opp_disclaimer">
+    ⚠️ &nbsp; This page shows publicly available information only. No confidential deal terms, investor lists, or financial projections are displayed. All investments involve risk. This is not investment advice. Contact Investa Solutions SA for full deal materials.
+  </div>
+
+</div>
+</div>
+
 </div><!-- #content -->
 
 <!-- FOOTER -->
 <div id="ftr">
-  <span>INVESTA SOLUTIONS SA · EOD data Sat 28 Mar 2026 · Sources: Yahoo Finance, Trading Economics, Investing.com, Reuters · Credit: ETF price proxies (LQD/HYG/IEAC/IHYG/EMB)</span>
+  <span data-i18n="footer_src">INVESTA SOLUTIONS SA · EOD data Sat 28 Mar 2026 · Sources: Yahoo Finance, Trading Economics, Investing.com, Reuters</span>
   <span id="fdate"></span>
 </div>
 
 <script>
 'use strict';
 
-// Clock
+// ── LANGUAGE SYSTEM ──────────────────────────────────────────────
+const LANG = {
+  en: {
+    tab_markets:'Markets', tab_news:'News', tab_portfolio:'Portfolio', tab_opps:'Opportunities',
+    opp_meta:'🔭 Investa Solutions SA · Live Deal Pipeline · Public Teasers Only',
+    opp_intro:'Active co-investment opportunities currently in placement. All information shown is publicly available. For full deal documentation, term sheets, and access to data rooms, contact Investa directly.',
+    opp_loading:'⟳   Loading opportunities from Airtable…',
+    opp_disclaimer:'⚠️  This page shows publicly available information only. No confidential deal terms or financial projections are displayed. This is not investment advice.',
+    opp_no_deals:'No public opportunities found at this time. Check back soon.',
+    opp_contact:'Contact Investa →',
+    footer_src:'INVESTA SOLUTIONS SA · EOD data Sat 28 Mar 2026 · Sources: Yahoo Finance, Trading Economics, Investing.com, Reuters',
+    brief_label:'Morning Commentary',
+    sect_equities:'Equities', sect_rates:'Rates & Fixed Income', sect_fx:'FX & Currency',
+    sect_oil:'Oil & Commodities', sect_macro:'Macro & Geopolitics',
+    port_meta:'📁 Investa Solutions SA · Private Markets Portfolio · 24 Positions · As of 29 Mar 2026',
+    port_intro:'Direct investments across AI, fintech, biotech, industrial, energy, healthcare, real estate, climate and space. Valuations sourced from latest confirmed funding rounds or secondary transactions as reported in public media.',
+    val_label:'Valuation', stage_label:'Stage', raised_label:'Total Raised',
+    not_public:'Not public', contact_investa:'Contact Investa for latest update.',
+    sect_ai:'AI & SaaS', sect_fin:'FinTech', sect_bio:'BioTech',
+    sect_ind:'Industrial', sect_nrg:'Energy', sect_deep:'Deep Tech & IT',
+    sect_re:'Real Estate', sect_con:'Consumer & E-Commerce', sect_agri:'Agriculture', sect_spc:'Space',
+    disclaim:'⚠️  VALUATIONS are last-known private market figures. Not fair value or investment advice. Klarna is listed on NYSE (KLAR).',
+    opp_disclaim:'⚠️  This page shows publicly available information only. This is not investment advice. Contact Investa Solutions SA for full deal materials.',
+  },
+  it: {
+    tab_markets:'Mercati', tab_news:'Notizie', tab_portfolio:'Portafoglio', tab_opps:'Opportunità',
+    opp_meta:'🔭 Investa Solutions SA · Pipeline Operazioni · Solo Informazioni Pubbliche',
+    opp_intro:'Opportunità di co-investimento attualmente in collocamento. Tutte le informazioni mostrate sono pubblicamente disponibili. Per documentazione completa, term sheet e accesso alle data room, contattare Investa direttamente.',
+    opp_loading:'⟳   Caricamento opportunità da Airtable…',
+    opp_disclaimer:'⚠️  Questa pagina mostra solo informazioni pubblicamente disponibili. Nessun termine riservato o proiezione finanziaria è mostrata. Non è un consiglio di investimento.',
+    opp_no_deals:'Nessuna opportunità pubblica disponibile al momento. Torna presto.',
+    opp_contact:'Contatta Investa →',
+    footer_src:'INVESTA SOLUTIONS SA · Dati EOD Sab 28 Mar 2026 · Fonti: Yahoo Finance, Trading Economics, Investing.com, Reuters',
+    brief_label:'Commento del Mattino',
+    sect_equities:'Azioni', sect_rates:'Tassi & Reddito Fisso', sect_fx:'Valute',
+    sect_oil:'Petrolio & Materie Prime', sect_macro:'Macro & Geopolitica',
+    port_meta:'📁 Investa Solutions SA · Portafoglio Mercati Privati · 24 Posizioni · Al 29 Mar 2026',
+    port_intro:'Investimenti diretti in AI, fintech, biotech, industria, energia, sanità, immobiliare, clima e spazio. Le valutazioni derivano dagli ultimi round di finanziamento confermati o transazioni secondarie riportati nei media.',
+    val_label:'Valutazione', stage_label:'Fase', raised_label:'Totale Raccolto',
+    not_public:'Non pubblico', contact_investa:'Contattare Investa per aggiornamenti.',
+    sect_ai:'AI & SaaS', sect_fin:'FinTech', sect_bio:'BioTech',
+    sect_ind:'Industriale', sect_nrg:'Energia', sect_deep:'Deep Tech & IT',
+    sect_re:'Immobiliare', sect_con:'Consumatori & E-Commerce', sect_agri:'Agricoltura', sect_spc:'Spazio',
+    disclaim:'⚠️  Le VALUTAZIONI sono gli ultimi dati noti di mercato privato. Non costituiscono fair value o consulenza. Klarna è quotata su NYSE (KLAR).',
+    opp_disclaim:'⚠️  Solo informazioni pubbliche. Non costituisce consulenza di investimento. Contattare Investa Solutions SA per i materiali completi.',
+  }
+};
+
+let currentLang = 'en';
+// Cache translated HTML per page so we only call the API once per session
+const _itCache = {};
+// Store original EN HTML for each translatable page
+const _enOriginal = {};
+
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('btn-en').classList.toggle('active', lang==='en');
+  document.getElementById('btn-it').classList.toggle('active', lang==='it');
+
+  // 1. Always translate static labels immediately (tabs, headers, UI chrome)
+  const L = LANG[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (L[key] !== undefined) el.textContent = L[key];
+  });
+  document.querySelectorAll('.section-hdr[data-sect]').forEach(el => {
+    const key = el.getAttribute('data-sect');
+    if (L[key]) el.firstChild.textContent = L[key];
+  });
+  document.querySelectorAll('.psec-hdr[data-sect]').forEach(el => {
+    const key = el.getAttribute('data-sect');
+    if (L[key]) el.firstChild.textContent = L[key];
+  });
+
+  // 2. For news and portfolio content, use AI translation
+  if (lang === 'it') {
+    translatePageAI('pg-news');
+    translatePageAI('pg-portfolio');
+  } else {
+    // Restore English originals
+    ['pg-news','pg-portfolio'].forEach(id => {
+      if (_enOriginal[id]) {
+        document.getElementById(id).innerHTML = _enOriginal[id];
+        // Re-attach data-sect attributes after restore
+        document.querySelectorAll('.section-hdr[data-sect], .psec-hdr[data-sect]').forEach(el => {
+          const key = el.getAttribute('data-sect');
+          if (L[key]) el.firstChild.textContent = L[key];
+        });
+      }
+    });
+  }
+}
+
+// Indicator shown while translating
+function showTranslating(pageId) {
+  const el = document.getElementById(pageId);
+  if (!el._transBar) {
+    const bar = document.createElement('div');
+    bar.style.cssText = 'position:sticky;top:0;z-index:100;background:var(--amber);color:#000;font-family:var(--mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;';
+    bar.textContent = '⟳  Traduzione in corso…';
+    el.prepend(bar);
+    el._transBar = bar;
+  }
+}
+function hideTranslating(pageId) {
+  const el = document.getElementById(pageId);
+  if (el._transBar) { el._transBar.remove(); el._transBar = null; }
+}
+
+async function translatePageAI(pageId) {
+  // Use cached translation if available
+  if (_itCache[pageId]) {
+    document.getElementById(pageId).innerHTML = _itCache[pageId];
+    return;
+  }
+
+  const el = document.getElementById(pageId);
+  // Save English original before first translation
+  if (!_enOriginal[pageId]) _enOriginal[pageId] = el.innerHTML;
+
+  showTranslating(pageId);
+
+  // Extract only the translatable text nodes — headlines, body text, brief
+  // We send a compact JSON list of {id, text} pairs, get back translated pairs
+  const targets = [];
+  el.querySelectorAll('.cheadline a, .cbody, .morning-brief, .pdesc, .p-brief, .pnote, .opp-desc, .opp-brief').forEach((node, i) => {
+    const tid = 'tr_' + pageId.replace('-','_') + '_' + i;
+    node.setAttribute('data-trid', tid);
+    targets.push({ id: tid, text: node.innerHTML.replace(/<[^>]+>/g, '') });
+  });
+
+  if (targets.length === 0) { hideTranslating(pageId); return; }
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        system: 'You are a financial Italian translator. Translate the provided text segments from English to professional Italian suitable for institutional investors. Return ONLY a valid JSON array with the same structure as the input: [{id, text}]. Keep all numbers, percentages, tickers, and proper nouns unchanged. No markdown, no explanation.',
+        messages: [{ role: 'user', content: JSON.stringify(targets) }]
+      })
+    });
+
+    if (!res.ok) throw new Error('API ' + res.status);
+    const data = await res.json();
+    const raw = data.content.filter(b => b.type === 'text').map(b => b.text).join('').trim()
+      .replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
+
+    const translated = JSON.parse(raw.match(/\[[\s\S]+\]/)[0]);
+    translated.forEach(item => {
+      const node = el.querySelector(`[data-trid="${item.id}"]`);
+      if (node) {
+        // Preserve any <a> or <em> tags from original, replace only text
+        const orig = node.innerHTML;
+        const hasLink = orig.includes('<a ');
+        if (hasLink) {
+          // Replace text inside <a> tag but keep href
+          node.innerHTML = orig.replace(/(<a[^>]*>)([^<]+)(<\/a>)/, `$1${item.text}$3`);
+        } else {
+          node.textContent = item.text;
+        }
+      }
+    });
+
+    // Cache the translated HTML
+    _itCache[pageId] = el.innerHTML;
+  } catch(e) {
+    console.warn('Translation failed:', e);
+    // Fail gracefully — content stays in English
+  }
+
+  hideTranslating(pageId);
+}
+
+// ── CLOCK ──────────────────────────────────────────────────────────
 (function tick(){
   document.getElementById('clk').textContent =
     new Date().toLocaleTimeString('en-GB',{timeZone:'Europe/Zurich',hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'})+' CET';
@@ -1223,15 +1493,168 @@ tr:hover td { background: rgba(255,255,255,.02); }
 document.getElementById('fdate').textContent =
   new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 
-// Tabs
+// ── TABS ──────────────────────────────────────────────────────────
 function go(id, el){
   document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(t => t.classList.remove('active'));
   document.getElementById('pg-'+id).classList.add('on');
   el.classList.add('active');
+  // Show ticker only on prices tab
+  document.getElementById('ticker').classList.toggle('hidden', id !== 'prices');
+  // Load opportunities on first open
+  if (id === 'opportunities' && !window._oppLoaded) loadOpportunities();
 }
 
-// Sparkline
+// ── AIRTABLE OPPORTUNITIES ────────────────────────────────────────
+// Replace these with your actual Airtable Base ID and API key
+// Base ID: find in Airtable URL → airtable.com/BASE_ID/...
+// API key: airtable.com/create/tokens → Personal access token with base:read scope
+const AIRTABLE_BASE_ID = 'YOUR_BASE_ID';
+const AIRTABLE_API_KEY = 'YOUR_AIRTABLE_PAT';
+const AIRTABLE_TABLE   = 'Deals'; // your table name
+
+async function loadOpportunities() {
+  window._oppLoaded = true;
+  const container = document.getElementById('opp-content');
+  const L = LANG[currentLang];
+
+  // Skip if not configured
+  if (AIRTABLE_BASE_ID === 'YOUR_BASE_ID') {
+    container.innerHTML = renderDemoOpportunities();
+    return;
+  }
+
+  try {
+    // Fetch only records where Public = true (checkbox field)
+    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE)}?filterByFormula={Public}=1&sort[0][field]=Name&sort[0][direction]=asc`;
+    const res = await fetch(url, {
+      headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` }
+    });
+    if (!res.ok) throw new Error(`Airtable error ${res.status}`);
+    const data = await res.json();
+
+    if (!data.records || data.records.length === 0) {
+      container.innerHTML = `<div class="opp-loading">${L.opp_no_deals}</div>`;
+      return;
+    }
+
+    container.innerHTML = renderAirtableRecords(data.records);
+  } catch(e) {
+    console.error(e);
+    container.innerHTML = `<div class="opp-err">⚠️ Could not load from Airtable: ${e.message}<br><br>Check that AIRTABLE_BASE_ID and AIRTABLE_API_KEY are set correctly in the HTML file, and that your Personal Access Token has read access to the base.</div>`;
+  }
+}
+
+function renderAirtableRecords(records) {
+  // Groups by Sector field if present
+  const groups = {};
+  records.forEach(r => {
+    const f = r.fields;
+    const sector = f.Sector || f.sector || 'Other';
+    if (!groups[sector]) groups[sector] = [];
+    groups[sector].push(f);
+  });
+
+  let html = '';
+  Object.entries(groups).forEach(([sector, deals]) => {
+    html += `<div class="opp-sec-hdr"><span>${sector}</span></div>`;
+    html += '<div class="opp-cards">';
+    deals.forEach(f => {
+      const name    = f.Name || f.name || '—';
+      const stage   = f.Stage || f.stage || '—';
+      const desc    = f.Description || f.description || f['Public Description'] || '';
+      const website = f.Website || f.website || '';
+      const logo    = f.Logo || '';
+      const valuation = f.Valuation || f['Last Valuation'] || '';
+      const raised  = f['Total Raised'] || f.Raised || '';
+      const news1   = f['News 1'] || f.News || '';
+      const news1url= f['News 1 URL'] || f['News URL'] || '';
+      const status  = f.Status || 'Open';
+      const currency = f.Currency || 'USD';
+      const logoHtml = logo
+        ? `<img src="${logo}" onerror="this.parentNode.innerHTML='💼'" alt="">`
+        : (website ? `<img src="https://logo.clearbit.com/${new URL(website).hostname}" onerror="this.parentNode.innerHTML='💼'" alt="">` : '💼');
+      const statusClass = status.toLowerCase().includes('final') ? 'status-final' : 'status-open';
+
+      html += `
+      <div class="opp-card">
+        <div class="opp-head">
+          <div class="opp-logo">${logoHtml}</div>
+          <div>
+            <div class="opp-name">${website ? `<a href="${website}" target="_blank">${name}</a>` : name}</div>
+            <div class="opp-badges">
+              <span class="opp-badge">${stage}</span>
+              <span class="opp-badge">${sector}</span>
+              <span class="opp-badge ${statusClass}">${status}</span>
+            </div>
+          </div>
+        </div>
+        <div class="opp-metrics">
+          <div class="opp-met"><div class="opp-met-l">Valuation</div><div class="opp-met-v ${valuation?'':'nd'}">${valuation||'Undisclosed'}</div></div>
+          <div class="opp-met"><div class="opp-met-l">Stage</div><div class="opp-met-v" style="font-size:8.5px">${stage}</div></div>
+          <div class="opp-met"><div class="opp-met-l">Raised</div><div class="opp-met-v ${raised?'':'nd'}">${raised||'—'}</div></div>
+        </div>
+        ${desc ? `<div class="opp-desc">${desc}</div>` : ''}
+        ${news1 ? `<div class="opp-news"><div class="opp-news-row"><div class="opp-news-dot"></div>${news1url?`<a href="${news1url}" target="_blank">${news1}</a>`:`<span style="color:var(--text2)">${news1}</span>`}</div></div>` : ''}
+      </div>`;
+    });
+    html += '</div>';
+  });
+  return html;
+}
+
+// Demo opportunities shown when Airtable is not yet configured
+function renderDemoOpportunities() {
+  return `
+  <div style="padding:10px 0 6px">
+    <div class="opp-sec-hdr"><span>AI & Deep Tech</span></div>
+    <div class="opp-cards">
+      <div class="opp-card">
+        <div class="opp-head">
+          <div class="opp-logo"><img src="https://logo.clearbit.com/axelera.ai" onerror="this.parentNode.innerHTML='🤖'" alt=""></div>
+          <div>
+            <div class="opp-name"><a href="https://axelera.ai" target="_blank">Axelera AI</a></div>
+            <div class="opp-badges"><span class="opp-badge">Series C</span><span class="opp-badge">AI Chips</span><span class="opp-badge status-open">Open</span></div>
+          </div>
+        </div>
+        <div class="opp-metrics">
+          <div class="opp-met"><div class="opp-met-l">Last Val.</div><div class="opp-met-v">$1B+</div></div>
+          <div class="opp-met"><div class="opp-met-l">Stage</div><div class="opp-met-v" style="font-size:8.5px">Series C</div></div>
+          <div class="opp-met"><div class="opp-met-l">Focus</div><div class="opp-met-v" style="font-size:8.5px">Edge AI</div></div>
+        </div>
+        <div class="opp-desc">Dutch edge AI inference chip startup. Metis platform delivers 400 TOPS at under 10W — targeting industrial, automotive, and smart city applications. Competing with Hailo and Qualcomm in the on-device AI inference market.</div>
+        <div class="opp-news">
+          <div class="opp-news-row"><div class="opp-news-dot"></div><a href="https://axelera.ai/news" target="_blank">Latest from Axelera AI →</a></div>
+        </div>
+      </div>
+
+      <div class="opp-card">
+        <div class="opp-head">
+          <div class="opp-logo"><img src="https://logo.clearbit.com/blykalla.com" onerror="this.parentNode.innerHTML='⚛️'" alt=""></div>
+          <div>
+            <div class="opp-name"><a href="https://blykalla.com" target="_blank">Blykalla</a></div>
+            <div class="opp-badges"><span class="opp-badge">CLA2</span><span class="opp-badge">Nuclear SMR</span><span class="opp-badge status-final">Final Close</span></div>
+          </div>
+        </div>
+        <div class="opp-metrics">
+          <div class="opp-met"><div class="opp-met-l">Instrument</div><div class="opp-met-v" style="font-size:8.5px">Conv. Loan</div></div>
+          <div class="opp-met"><div class="opp-met-l">Stage</div><div class="opp-met-v" style="font-size:8.5px">CLA Round 2</div></div>
+          <div class="opp-met"><div class="opp-met-l">Focus</div><div class="opp-met-v" style="font-size:8.5px">Lead SMR</div></div>
+        </div>
+        <div class="opp-desc">Swedish lead-cooled small modular reactor. SEALER design targets 3–10 MWe for off-grid and remote industrial applications. Partnership with Oklo for US fuel ecosystem. CLA2 convertible loan round currently closing.</div>
+        <div class="opp-news">
+          <div class="opp-news-row"><div class="opp-news-dot"></div><a href="https://blykalla.com/news" target="_blank">Latest from Blykalla →</a></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:10px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-left:2px solid var(--amber);font-size:8.5px;color:var(--text);font-family:var(--mono);line-height:1.7;">
+      ℹ️ &nbsp; <strong style="color:var(--text2)">Demo mode.</strong> Connect your Airtable base by replacing <code>YOUR_BASE_ID</code> and <code>YOUR_AIRTABLE_PAT</code> in the script section of index.html. Records with <strong>Public = ✓</strong> will appear here automatically.
+    </div>
+  </div>`;
+}
+
+// ── SPARKLINE ─────────────────────────────────────────────────────
 function spark(vals, pos){
   if(!vals||vals.length<2) return '';
   const W=54,H=17,P=1.5;
@@ -1252,12 +1675,6 @@ const pct = (v, d=2) => {
   return `<span class="${v>0?'g':v<0?'r':'d'}">${v>0?'+':''}${Number(v).toFixed(d)}%</span>`;
 };
 
-// ── EOD DATA — Tuesday 03 March 2026 ──────────────────────────────
-// S&P 500 close 6,816.63 per CNBC; Nasdaq 22,516.69; Dow 48,501.27
-// DAX 23,765 / FTSE 10,780 / Nikkei 56,279 — all confirmed Yahoo Finance
-// WTI $74.56 / Brent $81.40 — confirmed CNBC
-// US 10Y 4.10% — confirmed Trading Economics
-// EUR/USD 1.1597 / USD/JPY 157.38 / USD/CHF 0.7816 — confirmed Yahoo Finance
 const D = {
   // EOD data — 28 Mar 2026 | Sources: Yahoo Finance, Trading Economics, Investing.com, Middle East Insider
   eq:[
@@ -1377,6 +1794,10 @@ function render(d){
 
 // AI Refresh
 render(D);
+</script>
+</body>
+</html>
+
 </script>
 </body>
 </html>
