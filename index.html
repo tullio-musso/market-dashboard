@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INVESTA | Market Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+:root {
+  --bg: #060a0f; --bg2: #0b1119; --bg3: #101620;
+  --border: #18222e; --border2: #1f2d3d;
+  --amber: #f0a500; --amber2: #c27f00;
+  --green: #00b87a; --red: #e8334a;
+  --blue: #3d8ef5; --purple: #8b6cf7;
+  --text: #8fa3b8; --text2: #c8d8e8; --text3: #e8f2fa;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 12px; }
+body { background: var(--bg); color: var(--text); font-family: var(--mono); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+/* === HEADER === */
+#hdr {
+  background: var(--bg2); border-bottom: 1px solid var(--border2);
+  height: 48px; display: flex; align-items: center; padding: 0 16px;
+  gap: 12px; position: sticky; top: 0; z-index: 200;
+}
+.logo { font-size: 11px; font-weight: 700; letter-spacing: 4px; color: var(--amber); }
+.hdiv { width: 1px; height: 20px; background: var(--border2); }
+.htag { font-size: 8.5px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--text); }
+#clk { font-size: 11px; color: var(--text3); letter-spacing: 0.5px; }
+.dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+#status { margin-left: auto; font-size: 9px; color: var(--text); letter-spacing: 0.5px; }
+.hbtn {
+  background: transparent; border: 1px solid var(--border2);
+  color: var(--text); font-family: var(--mono); font-size: 8.5px;
+  letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 12px;
+  cursor: pointer; transition: all .15s; border-radius: 2px;
+}
+.hbtn:hover { border-color: var(--amber); color: var(--amber); }
+.hbtn:disabled { opacity: .35; cursor: not-allowed; }
+
+/* === TABS === */
+#tabs {
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+  display: flex; padding: 0 16px; flex-shrink: 0;
+}
+.tab {
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  padding: 10px 16px; cursor: pointer; color: var(--text);
+  border-bottom: 2px solid transparent; transition: all .15s;
+}
+.tab:hover { color: var(--text2); }
+.tab.active { color: var(--amber); border-bottom-color: var(--amber); }
+
+/* === TICKER === */
+#ticker {
+  height: 27px; background: var(--bg3); border-bottom: 1px solid var(--border);
+  display: flex; overflow: hidden; align-items: center; flex-shrink: 0;
+}
+#tbadge {
+  background: var(--amber); color: #000; font-size: 7.5px; font-weight: 700;
+  letter-spacing: 2.5px; padding: 0 10px; height: 100%; display: flex;
+  align-items: center; flex-shrink: 0; text-transform: uppercase;
+}
+.tscroll { overflow: hidden; flex: 1; }
+#tinner { display: flex; white-space: nowrap; animation: scroll 80s linear infinite; }
+.ti { display: inline-flex; gap: 5px; padding: 0 16px; border-right: 1px solid var(--border); font-size: 10px; align-items: center; }
+.tiname { color: var(--text); }
+.tiprice { color: var(--text3); }
+@keyframes scroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+/* === PAGES === */
+#content { flex: 1; overflow-y: auto; overflow-x: hidden; }
+.page { display: none; }
+.page.on { display: block; }
+
+/* === PRICES PAGE === */
+#pg-prices { padding: 10px 14px 24px; display: flex; flex-direction: column; gap: 8px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media(max-width:960px) { .row2 { grid-template-columns: 1fr; } }
+.blk { display: flex; flex-direction: column; gap: 5px; }
+.blk-title {
+  font-size: 8px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--amber); display: flex; align-items: center; gap: 8px;
+}
+.blk-title::after { content:''; flex:1; height:1px; background: linear-gradient(90deg, var(--border2), transparent); }
+.tag { display: inline-block; font-size: 7px; padding: 1px 5px; border: 1px solid var(--border2); color: var(--text); border-radius: 2px; margin-left: 4px; }
+table { width: 100%; border-collapse: collapse; background: var(--bg2); border: 1px solid var(--border); font-size: 10.5px; }
+thead tr { background: #080e15; }
+th { font-size: 8px; letter-spacing: 1px; text-transform: uppercase; font-weight: 400; color: var(--text); padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--border2); white-space: nowrap; }
+th:first-child { text-align: left; }
+td { padding: 4px 8px; text-align: right; border-bottom: 1px solid var(--border); color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+td:first-child { text-align: left; color: var(--text3); font-weight: 500; }
+td.unit { font-size: 8px; color: var(--text); padding: 0 2px; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,.02); }
+.g { color: var(--green) !important; }
+.r { color: var(--red) !important; }
+.d { color: var(--text) !important; }
+@keyframes flash { 0%{background:rgba(240,165,0,.12)} 100%{background:transparent} }
+.fl { animation: flash .5s ease; }
+
+/* === NEWS PAGE === */
+#pg-news { padding: 12px 14px 30px; }
+.morning-brief {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-left: 3px solid var(--amber); padding: 14px 16px;
+  margin-bottom: 12px; font-family: var(--sans); font-size: 11px;
+  line-height: 1.75; color: var(--text2);
+}
+.morning-brief strong { color: var(--text3); }
+.morning-brief .meta { font-family: var(--mono); font-size: 8.5px; color: var(--text); letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase; }
+
+.section { margin-bottom: 14px; }
+.section-hdr {
+  font-size: 8px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--amber); display: flex; align-items: center; gap: 8px; margin-bottom: 7px;
+}
+.section-hdr::after { content:''; flex:1; height:1px; background: linear-gradient(90deg, var(--border2), transparent); }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 7px; }
+.card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-left: 2px solid var(--border2); padding: 11px 13px;
+  display: flex; flex-direction: column; gap: 6px; transition: border-color .15s;
+}
+.card:hover { border-left-color: var(--amber); }
+.card.eq  { border-left-color: #3d8ef5; }
+.card.rates { border-left-color: #8b6cf7; }
+.card.fx   { border-left-color: #00b87a; }
+.card.oil  { border-left-color: #f0a500; }
+.card.gold { border-left-color: #e8d44d; }
+.card.macro{ border-left-color: #3a4a5a; }
+.card.credit{border-left-color: #e8334a; }
+.card-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ctag {
+  font-size: 7px; letter-spacing: 1px; text-transform: uppercase;
+  padding: 2px 6px; border-radius: 2px; font-weight: 600; font-family: var(--mono);
+}
+.ctag.eq    { background: #0b1f38; color: #3d8ef5; }
+.ctag.rates { background: #150e30; color: #8b6cf7; }
+.ctag.fx    { background: #012e1e; color: #00b87a; }
+.ctag.oil   { background: #2e1a00; color: #f0a500; }
+.ctag.gold  { background: #2a2200; color: #e8d44d; }
+.ctag.macro { background: #0e1820; color: var(--text2); }
+.ctag.credit{ background: #2a0812; color: #e8334a; }
+.csrc { font-size: 8.5px; color: var(--text); font-family: var(--mono); }
+.cdate { font-size: 8px; color: var(--text); font-family: var(--mono); margin-left: auto; }
+.cheadline { font-family: var(--sans); font-size: 11.5px; font-weight: 500; color: var(--text3); line-height: 1.4; }
+.cheadline a { color: inherit; text-decoration: none; }
+.cheadline a:hover { color: var(--amber); }
+.cbody { font-family: var(--sans); font-size: 10.5px; color: var(--text2); line-height: 1.6; }
+.clink { font-size: 9px; color: var(--blue); text-decoration: none; font-family: var(--mono); }
+.clink:hover { color: var(--amber); }
+.news-footer { font-size: 8.5px; color: var(--text); text-align: right; margin-top: 8px; font-family: var(--mono); }
+
+/* === FOOTER === */
+#ftr {
+  background: var(--bg2); border-top: 1px solid var(--border);
+  padding: 7px 16px; display: flex; justify-content: space-between;
+  font-size: 8px; color: var(--text); flex-wrap: wrap; gap: 4px;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="hdr">
+  <div class="logo">INVESTA</div>
+  <div class="hdiv"></div>
+  <div class="htag">Morning Brief</div>
+  <div class="dot"></div>
+  <span id="clk"></span>
+  <div id="status">
+    <span id="stxt">EOD · Sat 28 Mar 2026</span>
+  </div>
+</div>
+
+<!-- TABS -->
+<div id="tabs">
+  <div class="tab active" onclick="go('prices',this)">📊 &nbsp;Prices</div>
+  <div class="tab" onclick="go('news',this)">📰 &nbsp;News &amp; Commentary</div>
+  <div class="tab" onclick="go('portfolio',this)">🏦 &nbsp;Portfolio</div>
+</div>
+
+<!-- TICKER -->
+<div id="ticker">
+  <div id="tbadge">EOD</div>
+  <div class="tscroll"><div id="tinner"></div></div>
+</div>
+
+<!-- ═══════════════════ SCROLLABLE CONTENT ═══════════════════ -->
+<div id="content">
+
+<!-- ═══════════════════ PAGE 1 — PRICES ═══════════════════ -->
+<div class="page on" id="pg-prices">
+
+  <div id="pg-prices-inner" style="padding:10px 14px 24px;display:flex;flex-direction:column;gap:8px;">
+
+    <!-- EQUITIES -->
+    <div class="blk">
+      <div class="blk-title">Equity Indices <span class="tag">EOD 03-Mar-2026</span></div>
+      <table>
+        <thead><tr><th>Index</th><th>Last</th><th>1D Chg</th><th>1D %</th><th>YTD %</th><th>1Y %</th><th>5D</th></tr></thead>
+        <tbody id="tb-eq"></tbody>
+      </table>
+    </div>
+
+    <div class="row2">
+      <!-- RATES -->
+      <div class="blk">
+        <div class="blk-title">Gov Yields — 10Y <span class="tag">EOD</span></div>
+        <table>
+          <thead><tr><th>Bond</th><th>Yield</th><th>1D bp</th><th>YTD bp</th><th>1Y %</th><th>5D</th></tr></thead>
+          <tbody id="tb-rt"></tbody>
+        </table>
+      </div>
+      <!-- FX -->
+      <div class="blk">
+        <div class="blk-title">G10 FX <span class="tag">EOD</span></div>
+        <table>
+          <thead><tr><th>Pair</th><th>Rate</th><th>1D %</th><th>YTD %</th><th>1Y %</th><th>5D</th></tr></thead>
+          <tbody id="tb-fx"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="row2">
+      <!-- COMMODITIES -->
+      <div class="blk">
+        <div class="blk-title">Commodities <span class="tag">EOD</span></div>
+        <table>
+          <thead><tr><th>Asset</th><th>Price</th><th></th><th>1D %</th><th>YTD %</th><th>1Y %</th><th>5D</th></tr></thead>
+          <tbody id="tb-co"></tbody>
+        </table>
+      </div>
+      <!-- CREDIT -->
+      <div class="blk">
+        <div class="blk-title">Credit ETF Proxies <span class="tag" style="font-size:6.5px">↑ price = tighter</span></div>
+        <table>
+          <thead><tr><th>ETF</th><th>Price</th><th>1D %</th><th>YTD %</th><th>1Y %</th><th>5D</th></tr></thead>
+          <tbody id="tb-cr"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════ PAGE 2 — NEWS ═══════════════════ -->
+<div class="page" id="pg-news">
+<div id="pg-news-inner" style="padding:12px 14px 30px;">
+
+  <!-- MORNING BRIEF -->
+  <div class="morning-brief">
+    <div class="meta">Morning Commentary · Wednesday 4 March 2026</div>
+    <strong>The dominant story remains the US–Israel–Iran conflict (Operation Epic Fury, launched Feb 28).</strong> Iran confirmed the Strait of Hormuz is closed to commercial shipping; the IRGC threatened to attack any vessel attempting transit. Roughly 20% of global seaborne oil passes through the strait. Markets are caught between the energy inflation shock and Trump's pledge to escort tankers, which trimmed Tuesday's session lows. The S&P 500 fell as much as 2.5% before recovering to close −0.94%; the Dow −0.83%; Nasdaq −1.02%. Asian markets extend losses Wednesday — Nikkei −4%, KOSPI −7% (largest since 2008). <strong>Bonds are not providing a safe haven:</strong> the US 10Y yield rose +7bp to 4.10% on inflation re-pricing; the "buy bonds in a crisis" playbook is broken. Gold pulled back from its $5,350+ peak to ~$5,075–5,155 but structural demand remains intact. WTI settled +4.68% to $74.56; Brent +4.71% to $81.40 — both off intraday highs after Trump's tanker-escort statement. Natural gas +30% on Qatar LNG export halt. Key watch today: any Iran–US diplomatic signal, OPEC+ production response, Friday NFP.
+  </div>
+
+  <!-- EQUITIES -->
+  <div class="section">
+    <div class="section-hdr">Equities</div>
+    <div class="cards">
+
+      <div class="card eq">
+        <div class="card-top">
+          <span class="ctag eq">Equities</span>
+          <span class="csrc">CNBC</span>
+          <span class="cdate">Mar 3, 2026</span>
+        </div>
+        <div class="cheadline"><a href="https://www.cnbc.com/2026/03/02/stock-market-today-live-updates.html" target="_blank">S&P 500 closes −0.94%, Dow −0.83% — Trump tanker pledge cuts losses from 2.5% session low</a></div>
+        <div class="cbody">All 11 S&P sectors ended in the red. At intraday lows: S&P −2.5%, Dow down 1,200 points, Nasdaq −2.7%. Recovery came after Trump posted on Truth Social: "No matter what, the United States will ensure the FREE FLOW of ENERGY to the WORLD." Materials, industrials and health care led final declines. Nvidia −1.3%, Tesla −2.7%. Blackstone −3.8% on $1.7bn private credit outflow report. Defense stocks (Palantir, Lockheed, Northrop) were the session's standout gainers.</div>
+        <a class="clink" href="https://www.cnbc.com/2026/03/02/stock-market-today-live-updates.html" target="_blank">Full session wrap on CNBC ↗</a>
+      </div>
+
+      <div class="card eq">
+        <div class="card-top">
+          <span class="ctag eq">Equities</span>
+          <span class="csrc">Bloomberg</span>
+          <span class="cdate">Mar 4, 2026</span>
+        </div>
+        <div class="cheadline"><a href="https://www.bloomberg.com/news/articles/2026-03-03/stock-market-today-dow-s-p-live-updates-" target="_blank">Asian stocks plunge most in nearly a year — KOSPI crashes 12%, biggest drop since 2008</a></div>
+        <div class="cbody">MSCI Asia Pacific slumped 4.3% Wednesday. South Korea, the region's AI-investment poster child, saw its Kospi index crash 12% in a single session — the worst day since the global financial crisis. Japanese equities fell 4%. US and European futures are pointing lower heading into the Wednesday session, signalling the selloff is not yet exhausted.</div>
+        <a class="clink" href="https://www.bloomberg.com/news/articles/2026-03-03/stock-market-today-dow-s-p-live-updates-" target="_blank">Live updates on Bloomberg ↗</a>
+      </div>
+
+      <div class="card eq">
+        <div class="card-top">
+          <span class="ctag eq">Equities</span>
+          <span class="csrc">CNN Business</span>
+          <span class="cdate">Mar 3, 2026</span>
+        </div>
+        <div class="cheadline"><a href="https://www.cnn.com/2026/03/03/investing/us-stocks-iran-turmoil" target="_blank">Why stocks are acting weird about a spiralling Iran war — geopolitics vs. AI as dominant narrative</a></div>
+        <div class="cbody">Carson Group compiled 40 major geopolitical events since WWII: average S&P return is −0.9% in month one, but +3.4% over six months. AlphaCore's Stubbs: "The question of who wins from AI is still more dominant than the war in Iran for the US equity market." One month is manageable; prolonged Hormuz closure changes the calculus. Context: the market barely moved on the actual strikes, then sold off harder on day two as supply-chain reality set in.</div>
+        <a class="clink" href="https://www.cnn.com/2026/03/03/investing/us-stocks-iran-turmoil" target="_blank">Read on CNN ↗</a>
+      </div>
+
+      <div class="card eq">
+        <div class="card-top">
+          <span class="ctag eq">Equities</span>
+          <span class="csrc">Seeking Alpha</span>
+          <span class="cdate">Mar 3, 2026</span>
+        </div>
+        <div class="cheadline"><a href="https://seekingalpha.com/news/4560184-s-and-p-500-drops-to-a-three-month-low-erasing-all-2026-gains" target="_blank">S&P erases all 2026 gains at session lows — traded near 6,715 before recovering to close at 6,816</a></div>
+        <div class="cbody">At its worst, the benchmark was at levels last seen in early December 2025. The intraday range of 287 points (6,715–7,002 was the 52-week high) underlines the volatility regime shift. Memory chip stocks (Sandisk, best YTD performer in the S&P +100%) fell sharply. Semiconductor equipment names AMAT, LRCX, KLAC, ASML all down 6%+.</div>
+        <a class="clink" href="https://seekingalpha.com/news/4560184-s-and-p-500-drops-to-a-three-month-low-erasing-all-2026-gains" target="_blank">Read on Seeking Alpha ↗</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RATES -->
+  <div class="section">
+    <div class="section-hdr">Rates &amp; Fixed Income</div>
+    <div class="cards">
+
+      <div class="card rates">
+        <div class="card-top">
+          <span class="ctag rates">Rates</span>
+          <span class="csrc">Trading Economics</span>
+          <span class="cdate">Mar 3, 2026</span>
+        </div>
+        <div class="cheadline"><a href="https://tradingeconomics.com/united-states/government-bond-yield" target="_blank">US 10Y at 4.10% — bonds fail safe-haven test for second straight session as inflation bid dominates</a></div>
+        <div class="cbody">The 10Y rose ~7bp Tuesday after ~10bp Monday. Two consecutive sessions of selling despite equity risk-off is an unusual regime signal — inflation fear is outweighing flight-to-quality. The ISM manufacturing prices index hit a 3.5-year high. Fed cut expectations pushed back from July to September. Two 25bp cuts remain priced for 2026. Friday's NFP will be closely watched.</div>
+        <a class="clink" href="https://tradingeconomics.com/united-states/government-bond-yield" target="_blank">Data on Trading Economics ↗</a>
+      </div>
+
+      <div class="card rates">
+        <div class="card-top">
+          <span class="ctag rates">Rates</span>
+          <span class="csrc">J.P. Morgan / LPL Research</span>
+          <span class="cdate">2026 Outlook</span>
+        </div>
+        <div class="cheadline"><a href="https://www.lpl.com/research/weekly-market-commentary/navigating-neutral-fed-policy-key-for-fixed-income-markets-in-2026.html" target="_blank">Consensus: 10Y range 3.75–4.25% for 2026 — oil shock threatens the upper bound</a></div>
+        <div class="cbody">LPL Research and Schwab both expected the 10Y to trade 3.75–4.25% in 2026, with income as the primary return driver. That range is now being tested from above by the energy-inflation shock. JPM held rates steady in January; Fed funds currently 3.50–3.75%. New Chair (likely Kevin Warsh, more hawkish) expected to replace Powell in May — a structural uncertainty for bond markets heading into H2.</div>
+        <a class="clink" href="https://www.lpl.com/research/weekly-market-commentary/navigating-neutral-fed-policy-key-for-fixed-income-markets-in-2026.html" target="_blank">LPL Fixed Income Outlook ↗</a>
+      </div>
+
+      <div class="card rates">
+        <div class="card-top">
+          <span class="ctag rates">Rates</span>
+          <span class="csrc">iShares / BlackRock</span>
+          <span class="cdate">2026 Outlook</span>
+        </div>
+        <div class="cheadline"><a href="https://www.ishares.com/us/insights/fed-outlook-2026-interest-rate-forecast" target="_blank">Fed already cut 175bp since Sep 2024 — Dec 2025 rate was 3.50–3.75%; next move and pace uncertain</a></div>
+        <div class="cbody">Fed cut 25bp in Dec 2025 (third consecutive cut). January 2026 meeting: held steady. Two FOMC members dissented, preferring a cut. Inflation remains above the 2% target. iShares recommends belly of the curve (3–7Y), bond laddering, and selective high-yield exposure. The Iran conflict adds an upside shock risk to short-term inflation that could force the Fed to pause longer than currently expected.</div>
+        <a class="clink" href="https://www.ishares.com/us/insights/fed-outlook-2026-interest-rate-forecast" target="_blank">Read BlackRock/iShares ↗</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FX -->
+  <div class="section">
+    <div class="section-hdr">FX</div>
+    <div class="cards">
+
+      <div class="card fx">
+        <div class="card-top">
+          <span class="ctag fx">FX</span>
+          <span class="csrc">Trading Economics / MUFG</span>
+          <span class="cdate">Mar 3, 2026</span>
+        </div>
+        <div class="cheadline"><a href="https://tradingeconomics.com/euro-area/currency" target="_blank">EUR/USD slips to 1.16 — lowest since mid-January as USD firms on safe-haven and inflation bid</a></div>
+        <div class="cbody">EUR/USD was ~1.19 before the Iran strikes; now 1.16–1.17 as the dollar catches a bid from two sources simultaneously: safe-haven demand and inflation re-pricing that delays Fed cuts. Eurozone February inflation came in at 1.9% headline (below target), but energy shock will push that higher. Traders now price 40% probability of an ECB <em>hike</em> by year-end — a sharp reversal from cut pricing last week.</div>
+        <a class="clink" href="https://tradingeconomics.com/euro-area/currency" target="_blank">EUR/USD data ↗</a>
+      </div>
+
+      <div class="card fx">
+        <div class="card-top">
+          <span class="ctag fx">FX</span>
+          <span class="csrc">MUFG Research</span>
+          <span class="cdate">Mar 2026</span>
+        </div>
+        <div class="cheadline"><a href="https://www.mufgresearch.com/fx/monthly-foreign-exchange-outlook-march-2026/" target="_blank">MUFG March FX outlook: USD can extend near-term — but year-end targets unchanged on assumption of short conflict</a></div>
+        <div class="cbody">MUFG revised USD forecasts higher versus energy-importing currencies for Q1–Q2, but maintained year-end targets. Key assumption: the Iran conflict lasts weeks not months. They still see the Fed cutting 3× in 2026 before the midterms. EUR/USD targets 1.24+ by year-end if conflict resolves. USD/JPY yen strength expected to emerge in H2 as BoJ continues hiking (now at 0.75%). Current USD/JPY at 157 is near the Finance Ministry's intervention threshold of 160.</div>
+        <a class="clink" href="https://www.mufgresearch.com/fx/monthly-foreign-exchange-outlook-march-2026/" target="_blank">Read MUFG March FX Outlook ↗</a>
+      </div>
+
+      <div class="card fx">
+        <div class="card-top">
+          <span class="ctag fx">FX</span>
+          <span class="csrc">Cambridge Currencies / FX Empire</span>
+          <span class="cdate">Mar 3, 2026</span>
+        </div>
+        <div class="cheadline"><a href="https://cambridgecurrencies.com/usd-forecast-2026/" target="_blank">DXY near 98 — five-week high as Iran conflict overrides 2026's structural USD bear thesis</a></div>
+        <div class="cbody">The dollar's structural 2026 bear case (fading US exceptionalism, 3× Fed cuts, tariff headwinds) is being temporarily overwhelmed by geopolitical safe-haven demand. DXY hit ~98, a five-week high. Goldman and Deutsche Bank both target EUR/USD 1.25 by year-end — a 7%+ move from current levels. FX Empire notes EUR/USD 200-day MA at 1.14965 is key support. Bears need a hold below 1.16 to claim momentum.</div>
+        <a class="clink" href="https://cambridgecurrencies.com/usd-forecast-2026/" target="_blank">USD 2026 Forecast ↗</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- COMMODITIES -->
+  <div class="section">
+    <div class="section-hdr">Commodities — Oil, Gold &amp; Energy</div>
+    <div class="cards">
+
+      <div class="card oil">
+        <div class="card-top">
+          <span class="ctag oil">Oil</span>
+          <span class="csrc">CNBC</span>
+          <span class="cdate">Mar 3, 2026</span>
+        </div>
+        <div class="cheadline"><a href="https://www.cnbc.com/2026/03/03/crude-oil-prices-today-iran-war.html" target="_blank">WTI settles +4.68% at $74.56, Brent +4.71% at $81.40 — Trump's Hormuz escort pledge trims 9% intraday surge</a></div>
+        <div class="cbody">Prices surged as much as 9% intraday after Iran's IRGC confirmed the Strait closure and threatened to "set fire to any vessel that tries to pass." Trump's announcement that the US Development Finance Corporation will provide political risk insurance for maritime trade pulled prices back from highs. Natural gas surged 30%+ after Qatar halted LNG exports due to Iranian drone strikes on its export terminal.</div>
+        <a class="clink" href="https://www.cnbc.com/2026/03/03/crude-oil-prices-today-iran-war.html" target="_blank">Full crude oil report on CNBC ↗</a>
+      </div>
+
+      <div class="card oil">
+        <div class="card-top">
+          <span class="ctag oil">Oil</span>
+          <span class="csrc">Fortune / Goldman Sachs</span>
+          <span class="cdate">Mar 3, 2026</span>
+        </div>
+        <div class="cheadline"><a href="https://fortune.com/2026/03/03/how-long-will-iran-war-last-stock-market-oil-barrel-price-goldman-sachs/" target="_blank">Goldman's head of oil research: Brent at $80 implies the market prices a 4-week disruption</a></div>
+        <div class="cbody">Goldman's Daan Struyven: without sustained disruptions, Brent fair value is ~$65/bbl. At $80, traders are pricing ~4 weeks of Hormuz closure. The impact is a "convex function" of duration — days means land-storage workaround; 4+ weeks means real deficits. OPEC+ pledged +206k bpd but Saudi/UAE pipelines cap bypass throughput at 7mbd vs 20mbd normally through Hormuz. Iran pre-surged exports in February; buffer is limited.</div>
+        <a class="clink" href="https://fortune.com/2026/03/03/how-long-will-iran-war-last-stock-market-oil-barrel-price-goldman-sachs/" target="_blank">Read on Fortune ↗</a>
+      </div>
+
+      <div class="card oil">
+        <div class="card-top">
+          <span class="ctag oil">Oil</span>
+          <span class="csrc">The National</span>
+          <span class="cdate">Mar 3, 2026</span>
+        </div>
+        <div class="cheadline"><a href="https://www.thenationalnews.com/business/energy/2026/03/03/brent-surges-past-80-per-barrel-with-120-a-possibility-as-war-tensions-rise/" target="_blank">Brent hits $84+ as Iran strikes Fujairah and Duqm — $120/bbl is the tail risk, BMI keeps $67 base case</a></div>
+        <div class="cbody">Iran attacked oil storage at Fujairah (UAE) and a fuel tank at Oman's Duqm port, extending the conflict beyond the Strait blockade to alternative Gulf export routes. Union Bancaire Privée: $120/bbl if closure persists. Barclays: "The potential effect on oil markets is hard to overstate." But BMI (Fitch Solutions) maintains $67/bbl base case — their core view is a brief spike followed by Q2 retracement as geopolitical premium fades.</div>
+        <a class="clink" href="https://www.thenationalnews.com/business/energy/2026/03/03/brent-surges-past-80-per-barrel-with-120-a-possibility-as-war-tensions-rise/" target="_blank">Read on The National ↗</a>
+      </div>
+
+      <div class="card oil">
+        <div class="card-top">
+          <span class="ctag oil">Oil / Macro</span>
+          <span class="csrc">Kpler</span>
+          <span class="cdate">Mar 1, 2026</span>
+        </div>
+        <div class="cheadline"><a href="https://www.kpler.com/blog/us-iran-conflict-strait-of-hormuz-crisis-reshapes-global-oil-markets" target="_blank">Kpler: This is a real supply disruption, not just a risk premium — treat the price spike accordingly</a></div>
+        <div class="cbody">Kpler flags simultaneous disruption across crude, products, LPG, and LNG. Insurance withdrawal (not a physical blockade) is creating the de facto closure — same outcome for cargo flow. India most acutely exposed (dual oil + LNG shock). China more flexible via Russian crude and strategic reserves. Russia benefits as India/China pivot: this conflict materially improves Russia's competitive position in energy markets.</div>
+        <a class="clink" href="https://www.kpler.com/blog/us-iran-conflict-strait-of-hormuz-crisis-reshapes-global-oil-markets" target="_blank">Full Kpler analysis ↗</a>
+      </div>
+
+      <div class="card gold">
+        <div class="card-top">
+          <span class="ctag gold">Gold</span>
+          <span class="csrc">J.P. Morgan Global Research</span>
+          <span class="cdate">2026</span>
+        </div>
+        <div class="cheadline"><a href="https://www.jpmorgan.com/insights/global-research/commodities/gold-prices" target="_blank">JPM targets $5,055/oz Q4 2026, $5,400/oz by end-2027 — structural demand from central banks and ETFs</a></div>
+        <div class="cbody">Gold hit $5,595 all-time high on Jan 29 before a pullback, then surged to $5,350+ on the Iran strikes. Currently ~$5,075–5,155 after Tuesday's -3.8% pullback. JPM forecasts ~250 tonnes of ETF inflows in 2026; bar and coin demand to exceed 1,200 tonnes. Central banks now hold more gold than US Treasuries. WGC's "doom loop" scenario implies 15–30% further upside from structural safe-haven rotation driven by stock-bond correlation breakdown.</div>
+        <a class="clink" href="https://www.jpmorgan.com/insights/global-research/commodities/gold-prices" target="_blank">JPM Gold Research ↗</a>
+      </div>
+
+      <div class="card gold">
+        <div class="card-top">
+          <span class="ctag gold">Gold</span>
+          <span class="csrc">World Gold Council</span>
+          <span class="cdate">2026</span>
+        </div>
+        <div class="cheadline"><a href="https://www.gold.org/goldhub/research/why-gold-2026-cross-asset-perspective" target="_blank">WGC cross-asset view: gold's role evolving from safe-haven to debasement hedge — 60/40 diversification broken</a></div>
+        <div class="cbody">Stock-bond correlation at 30-year highs means traditional portfolio diversification is impaired. Gold fills the gap. Global gold ETFs have seen $77bn of inflows YTD, adding 700+ tonnes. WGC argues even after a large prior rally, gold has historically performed its safe-haven role during stress events. Rising yields, firmer USD, and risk-on rotation represent the bear case (−5% to −20%); the structural case points to continued central bank and ETF support.</div>
+        <a class="clink" href="https://www.gold.org/goldhub/research/why-gold-2026-cross-asset-perspective" target="_blank">Read on World Gold Council ↗</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MACRO / GEOPOLITICS -->
+  <div class="section">
+    <div class="section-hdr">Macro &amp; Geopolitics</div>
+    <div class="cards">
+
+      <div class="card macro">
+        <div class="card-top">
+          <span class="ctag macro">Geopolitics</span>
+          <span class="csrc">Wikipedia</span>
+          <span class="cdate">Updated daily</span>
+        </div>
+        <div class="cheadline"><a href="https://en.wikipedia.org/wiki/2026_Strait_of_Hormuz_crisis" target="_blank">2026 Strait of Hormuz Crisis — full timeline: Operation Epic Fury, IRGC closure, and global impact</a></div>
+        <div class="cbody">Feb 28: US–Israel strike on Iran kills Supreme Leader Khamenei (Operation Epic Fury). Mar 1: Iran retaliates, attacks US bases and Gulf energy infrastructure. Mar 2: IRGC confirms Hormuz closed; tanker traffic falls to near zero; 150+ ships anchor outside. Mar 3: Protection &amp; indemnity insurance withdrawn from Mar 5, making transit economically unviable. Simultaneously: Qatar halts LNG exports. Saudi Arabia activates East-West pipeline bypass (capacity: 7mbd vs 20mbd through Hormuz).</div>
+        <a class="clink" href="https://en.wikipedia.org/wiki/2026_Strait_of_Hormuz_crisis" target="_blank">Full Wikipedia timeline ↗</a>
+      </div>
+
+      <div class="card macro">
+        <div class="card-top">
+          <span class="ctag macro">Macro</span>
+          <span class="csrc">CNBC</span>
+          <span class="cdate">Mar 3, 2026</span>
+        </div>
+        <div class="cheadline"><a href="https://www.cnbc.com/2026/03/03/strait-of-hormuz-closure-which-countries-will-be-hit-the-most.html" target="_blank">Hormuz closure: India faces dual oil and LNG shock — China more flexible via Russia, but still exposed</a></div>
+        <div class="cbody">India: >50% of LNG imports Gulf-linked and Brent-indexed — a dual physical and financial shock. China: ~40% of oil imports and ~30% of LNG via Hormuz; strategic reserves and Russian pivot provide buffer. Japan and South Korea: most exposed given lack of alternative supply routes and limited strategic reserves. Europe: Dutch TTF natural gas +27%, UK gas futures +30% on Qatar LNG halt. Tanker day rates for VLCC doubled to $400k/day.</div>
+        <a class="clink" href="https://www.cnbc.com/2026/03/03/strait-of-hormuz-closure-which-countries-will-be-hit-the-most.html" target="_blank">Read on CNBC ↗</a>
+      </div>
+
+      <div class="card credit">
+        <div class="card-top">
+          <span class="ctag credit">Credit</span>
+          <span class="csrc">J.P. Morgan Asset Management</span>
+          <span class="cdate">2026</span>
+        </div>
+        <div class="cheadline"><a href="https://am.jpmorgan.com/us/en/asset-management/adv/insights/portfolio-insights/fixed-income/5-realistic-surprise-predictions-for-2026/" target="_blank">US HY spreads at 253bp — near record lows, but Iran energy shock is the first real test of 2026</a></div>
+        <div class="cbody">The all-time US HY spread low was 233bp (2007). Current cycle low: 253bp. Corporate fundamentals remain strong: maturity walls extended past 2026, secured debt share rising, defaults low. Private credit has absorbed marginal borrowers, leaving the HY index skewed toward quality. JPM's base case remains constructive — but a sustained oil shock feeding inflation and a more hawkish Fed would be the clearest threat to current spread levels.</div>
+        <a class="clink" href="https://am.jpmorgan.com/us/en/asset-management/adv/insights/portfolio-insights/fixed-income/5-realistic-surprise-predictions-for-2026/" target="_blank">JPM Fixed Income ↗</a>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="news-footer">Sources compiled Wed 04 Mar 2026 · Bloomberg · CNBC · Reuters · CNN · Fortune · Kpler · MUFG · JPMorgan · World Gold Council · Seeking Alpha · Trading Economics · Wikipedia · The National · LPL Research · iShares · Cambridge Currencies</div>
+
+</div>
+</div>
+
+
+<!-- ═══════════════════ PAGE 3 — PORTFOLIO ═══════════════════ -->
+<div class="page" id="pg-portfolio">
+<div style="padding:12px 14px 30px;">
+
+<style>
+/* ── Portfolio page styles ── */
+.p-brief {
+  font-family: var(--sans); font-size: 10.5px; color: var(--text2);
+  border-left: 2px solid #8b6cf7; padding: 10px 14px;
+  background: var(--bg2); line-height: 1.6; margin-bottom: 14px;
+}
+.p-brief .meta {
+  font-family: var(--mono); font-size: 8px; color: var(--text);
+  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px;
+}
+.pcards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 7px; margin-bottom: 4px;
+}
+.pcard {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-left: 3px solid var(--border2);
+  padding: 11px 12px 10px;
+  display: flex; flex-direction: column; gap: 8px;
+  transition: border-left-color .15s, box-shadow .15s;
+}
+.pcard:hover { box-shadow: 0 2px 16px rgba(0,0,0,.25); }
+/* sector colours on left border */
+.pcard.sai   { border-left-color:#3d8ef5; }
+.pcard.sfin  { border-left-color:#00b87a; }
+.pcard.sbio  { border-left-color:#ff6b8a; }
+.pcard.sind  { border-left-color:#ffb347; }
+.pcard.sdeep { border-left-color:#c084fc; }
+.pcard.snrg  { border-left-color:#f0a500; }
+.pcard.sre   { border-left-color:#e8d44d; }
+.pcard.shlth { border-left-color:#5ac8fa; }
+.pcard.sagri { border-left-color:#4cd9a0; }
+.pcard.sclim { border-left-color:#6ee7b7; }
+.pcard.scon  { border-left-color:#fb923c; }
+.pcard.secom { border-left-color:#a78bfa; }
+.pcard.sspc  { border-left-color:#38bdf8; }
+.pcard.sit   { border-left-color:#e879f9; }
+/* hover matches border */
+.pcard.sai:hover   { border-left-color:#5aa3ff; }
+.pcard.sfin:hover  { border-left-color:#00d68f; }
+.pcard.sbio:hover  { border-left-color:#ff8fa5; }
+.pcard.sind:hover  { border-left-color:#ffc96a; }
+.pcard.sdeep:hover { border-left-color:#d4a5ff; }
+.pcard.snrg:hover  { border-left-color:#ffc21a; }
+.pcard.sre:hover   { border-left-color:#f5e96a; }
+.pcard.shlth:hover { border-left-color:#7dd9ff; }
+.pcard.sagri:hover { border-left-color:#6ef5bb; }
+.pcard.sclim:hover { border-left-color:#90ffdc; }
+.pcard.scon:hover  { border-left-color:#ffa965; }
+.pcard.secom:hover { border-left-color:#c4a8ff; }
+.pcard.sspc:hover  { border-left-color:#69d8ff; }
+.pcard.sit:hover   { border-left-color:#f09dff; }
+
+.pcard-head { display: flex; align-items: center; gap: 9px; }
+.plogo {
+  width: 32px; height: 32px; flex-shrink: 0;
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 5px; display: flex; align-items: center;
+  justify-content: center; font-size: 14px; overflow: hidden;
+}
+.plogo img { width: 100%; height: 100%; object-fit: contain; border-radius: 4px; }
+.pname-col { flex: 1; min-width: 0; }
+.pname {
+  font-size: 11.5px; font-weight: 600; color: var(--text3);
+  font-family: var(--sans); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.pname a { color: inherit; text-decoration: none; }
+.pname a:hover { color: var(--amber); }
+.pbadges { display: flex; align-items: center; gap: 4px; margin-top: 3px; flex-wrap: wrap; }
+.pbadge {
+  font-size: 7px; letter-spacing: .8px; text-transform: uppercase;
+  padding: 1.5px 5px; border-radius: 2px; font-weight: 600;
+  font-family: var(--mono); border: 1px solid transparent; white-space: nowrap;
+}
+.pbadge.stage { border-color: var(--border2); color: var(--text2); }
+/* sector badge colours */
+.pbadge.sai   { background:#071428; color:#3d8ef5; }
+.pbadge.sfin  { background:#011c11; color:#00b87a; }
+.pbadge.sbio  { background:#200612; color:#ff6b8a; }
+.pbadge.sind  { background:#201100; color:#ffb347; }
+.pbadge.sdeep { background:#160722; color:#c084fc; }
+.pbadge.snrg  { background:#221100; color:#f0a500; }
+.pbadge.sre   { background:#1c1800; color:#e8d44d; }
+.pbadge.shlth { background:#001220; color:#5ac8fa; }
+.pbadge.sagri { background:#011c12; color:#4cd9a0; }
+.pbadge.sclim { background:#011c14; color:#6ee7b7; }
+.pbadge.scon  { background:#200c00; color:#fb923c; }
+.pbadge.secom { background:#110622; color:#a78bfa; }
+.pbadge.sspc  { background:#001220; color:#38bdf8; }
+.pbadge.sit   { background:#1a0420; color:#e879f9; }
+
+.pmets {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3px;
+}
+.pmet {
+  background: var(--bg3); border: 1px solid var(--border);
+  padding: 4px 6px; border-radius: 2px;
+}
+.pmet-l { font-size: 6.5px; letter-spacing: 1px; text-transform: uppercase; color: var(--text); font-family: var(--mono); margin-bottom: 2px; }
+.pmet-v { font-size: 10px; font-weight: 600; color: var(--text3); font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.pmet-v.nd { font-size: 8.5px; color: var(--text); font-weight: 400; font-style: italic; }
+
+.pdesc { font-size: 9.5px; color: var(--text2); font-family: var(--sans); line-height: 1.55; }
+
+.pnews { display: flex; flex-direction: column; gap: 3px; padding-top: 1px; }
+.pnews-row { display: flex; align-items: flex-start; gap: 5px; font-size: 8.5px; font-family: var(--sans); }
+.pnews-dot { width: 3px; height: 3px; min-width:3px; border-radius: 50%; background: var(--border2); margin-top: 4.5px; }
+.pnews-row a { color: var(--text); text-decoration: none; line-height: 1.45; flex: 1; transition: color .12s; }
+.pnews-row a:hover { color: var(--amber); }
+.psrc { color: var(--text); font-family: var(--mono); font-size: 7px; padding: 1px 3px; border: 1px solid var(--border); border-radius: 2px; white-space: nowrap; flex-shrink: 0; margin-left: 3px; align-self: flex-start; margin-top: 1px; }
+.pnote { color: var(--text); font-size: 8.5px; font-style: italic; }
+
+.psec-hdr {
+  font-size: 7.5px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--amber); display: flex; align-items: center; gap: 8px;
+  margin: 14px 0 6px; padding-top: 4px;
+}
+.psec-hdr::after { content:''; flex:1; height:1px; background: linear-gradient(90deg, var(--border2) 0%, transparent 100%); }
+
+.pdisclaim {
+  margin-top: 16px; padding: 9px 12px;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-left: 2px solid var(--border2);
+  font-size: 8px; color: var(--text); font-family: var(--mono); line-height: 1.7;
+}
+</style>
+
+<div class="p-brief">
+  <div class="meta">📁 Investa Solutions SA &nbsp;·&nbsp; Private Markets Portfolio &nbsp;·&nbsp; 24 Positions &nbsp;·&nbsp; As of 29 Mar 2026</div>
+  Direct investments across AI, fintech, biotech, industrial, energy, healthcare, real estate, climate and space. Valuations sourced from latest confirmed funding rounds or secondary transactions as reported in public media. Companies without public disclosures are flagged. Not investment advice.
+</div>
+
+<!-- ─── AI / SaaS ─── -->
+<div class="psec-hdr">🤖 AI &amp; SaaS</div>
+<div class="pcards">
+
+  <!-- Anthropic (tranche 1) -->
+  <div class="pcard sai">
+    <div class="pcard-head">
+      <div class="plogo"><img src="https://logo.clearbit.com/anthropic.com" onerror="this.innerHTML='🧠'" alt=""></div>
+      <div class="pname-col">
+        <div class="pname"><a href="https://anthropic.com" target="_blank">Anthropic</a></div>
+        <div class="pbadges"><span class="pbadge sai">SaaS · AI</span><span class="pbadge stage">Pre-IPO &nbsp;·&nbsp; Tranche 1</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v">$380B</div></div>
+      <div class="pmet"><div class="pmet-l">Round</div><div class="pmet-v" style="font-size:8.5px">Series G</div></div>
+      <div class="pmet"><div class="pmet-l">Total Raised</div><div class="pmet-v">~$64B</div></div>
+    </div>
+    <div class="pdesc">Maker of Claude. $30B Series G at $380B post-money (Feb 12 2026) — 2nd largest private round ever. ARR ~$14B annualised. Investors: GIC, Coatue, Founders Fund, MGX, D.E. Shaw. IPO preparations underway.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><a href="https://news.crunchbase.com/ai/anthropic-raises-30b-second-largest-deal-all-time/" target="_blank">Anthropic raises $30B at $380B — 2nd largest venture deal all time</a><span class="psrc">Crunchbase</span></div>
+    </div>
+  </div>
+
+  <!-- Anthropic 2 -->
+  <div class="pcard sai">
+    <div class="pcard-head">
+      <div class="plogo"><img src="https://logo.clearbit.com/anthropic.com" onerror="this.innerHTML='🧠'" alt=""></div>
+      <div class="pname-col">
+        <div class="pname"><a href="https://anthropic.com" target="_blank">Anthropic 2</a></div>
+        <div class="pbadges"><span class="pbadge sai">SaaS · AI</span><span class="pbadge stage">Pre-IPO &nbsp;·&nbsp; Tranche 2</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v">$380B</div></div>
+      <div class="pmet"><div class="pmet-l">Round</div><div class="pmet-v" style="font-size:8.5px">Series G</div></div>
+      <div class="pmet"><div class="pmet-l">ARR (est.)</div><div class="pmet-v">$14B+</div></div>
+    </div>
+    <div class="pdesc">Second Investa position in Anthropic. Same underlying company — position built separately. Leader in frontier AI safety research and large language model development.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><a href="https://sacra.com/c/anthropic/" target="_blank">Anthropic ARR $14B annualised Feb 2026; Claude Code at $2.5B ARR</a><span class="psrc">Sacra</span></div>
+    </div>
+  </div>
+
+  <!-- OpenAI -->
+  <div class="pcard sai">
+    <div class="pcard-head">
+      <div class="plogo"><img src="https://logo.clearbit.com/openai.com" onerror="this.innerHTML='🤖'" alt=""></div>
+      <div class="pname-col">
+        <div class="pname"><a href="https://openai.com" target="_blank">OpenAI</a></div>
+        <div class="pbadges"><span class="pbadge sai">SaaS · AI</span><span class="pbadge stage">Pre-IPO</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v">$840B</div></div>
+      <div class="pmet"><div class="pmet-l">Last Round</div><div class="pmet-v" style="font-size:8.5px">$110B (Feb 2026)</div></div>
+      <div class="pmet"><div class="pmet-l">Total Raised</div><div class="pmet-v">$168B</div></div>
+    </div>
+    <div class="pdesc">Maker of ChatGPT. $110B raise Feb 27 2026 — largest private round in history — at $840B post-money. Amazon, Nvidia &amp; SoftBank $30–50B each. 900M weekly active users; 50M+ paid subscribers.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><a href="https://techcrunch.com/2026/02/27/openai-raises-110b-in-one-of-the-largest-private-funding-rounds-in-history/" target="_blank">OpenAI raises $110B — largest private funding round in history</a><span class="psrc">TechCrunch</span></div>
+    </div>
+  </div>
+
+  <!-- Crescendo -->
+  <div class="pcard sit">
+    <div class="pcard-head">
+      <div class="plogo"><img src="https://logo.clearbit.com/crescendo.ai" onerror="this.innerHTML='📞'" alt=""></div>
+      <div class="pname-col">
+        <div class="pname"><a href="https://crescendo.ai" target="_blank">Crescendo</a></div>
+        <div class="pbadges"><span class="pbadge sit">IT · AI Contact Centre</span><span class="pbadge stage">Series C+</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v nd">Not public</div></div>
+      <div class="pmet"><div class="pmet-l">Stage</div><div class="pmet-v" style="font-size:8.5px">Series C+</div></div>
+      <div class="pmet"><div class="pmet-l">Sector</div><div class="pmet-v" style="font-size:8.5px">AI / CX SaaS</div></div>
+    </div>
+    <div class="pdesc">AI-powered contact centre automation. Uses large language models to handle customer service at scale, reducing cost per contact and improving resolution rates for enterprise clients across voice, chat, and email channels.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><a href="https://crescendo.ai" target="_blank">Visit crescendo.ai for latest product and company updates</a></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── FinTech ─── -->
+<div class="psec-hdr">💳 FinTech</div>
+<div class="pcards">
+
+  <!-- Klarna -->
+  <div class="pcard sfin">
+    <div class="pcard-head">
+      <div class="plogo"><img src="https://logo.clearbit.com/klarna.com" onerror="this.innerHTML='💳'" alt=""></div>
+      <div class="pname-col">
+        <div class="pname"><a href="https://klarna.com" target="_blank">Klarna</a></div>
+        <div class="pbadges"><span class="pbadge sfin">FinTech · BNPL / SaaS B2C</span><span class="pbadge stage">Pre-IPO at entry</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">IPO Price</div><div class="pmet-v">$40 / sh</div></div>
+      <div class="pmet"><div class="pmet-l">Exchange</div><div class="pmet-v">NYSE: KLAR</div></div>
+      <div class="pmet"><div class="pmet-l">IPO Date</div><div class="pmet-v" style="font-size:8.5px">Sep 10 2025</div></div>
+    </div>
+    <div class="pdesc">BNPL &amp; digital payments. IPO'd NYSE Sep 10 2025 at $40/share; opened at $52 (+30%), closed day 1 +15%. 2024 revenue $2.8B, first net profit since 2019. 114M consumers, 850K merchants, 26 countries. Now publicly traded — check NYSE for live price.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><a href="https://www.cnbc.com/2025/09/10/klarna-klar-stock-soars-after-us-ipo.html" target="_blank">Klarna IPO: shares surge on NYSE debut — valued at $17B at close</a><span class="psrc">CNBC</span></div>
+    </div>
+  </div>
+
+  <!-- Revolut -->
+  <div class="pcard sfin">
+    <div class="pcard-head">
+      <div class="plogo"><img src="https://logo.clearbit.com/revolut.com" onerror="this.innerHTML='🏦'" alt=""></div>
+      <div class="pname-col">
+        <div class="pname"><a href="https://revolut.com" target="_blank">Revolut</a></div>
+        <div class="pbadges"><span class="pbadge sfin">FinTech · Neobank</span><span class="pbadge stage">Pre-IPO</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v">$75B+</div></div>
+      <div class="pmet"><div class="pmet-l">2024 Revenue</div><div class="pmet-v">$4B</div></div>
+      <div class="pmet"><div class="pmet-l">2024 Net Profit</div><div class="pmet-v">$1.4B</div></div>
+    </div>
+    <div class="pdesc">Global neobank. Secondary at $75B (Nov 2025) led by Coatue, a16z, Fidelity, Nvidia Ventures. Revenue +72% YoY. Net profit +149% to $1.4B pre-tax in 2024. Bloomberg reports $100B valuation talks (Feb 2026). CEO says IPO "2–3 years away."</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><a href="https://techcrunch.com/2025/11/24/revolut-hits-75b-valuation-in-new-capital-raise/" target="_blank">Revolut hits $75B valuation in capital raise — led by Coatue, a16z, Fidelity</a><span class="psrc">TechCrunch</span></div>
+      <div class="pnews-row"><div class="pnews-dot"></div><a href="https://paymentexpert.com/2026/02/28/fintech-unwrapped-revolut-100bn-value/" target="_blank">Revolut in talks for $100B valuation share sale (Feb 2026)</a><span class="psrc">Payment Expert</span></div>
+    </div>
+  </div>
+
+  <!-- AGAM -->
+  <div class="pcard sfin">
+    <div class="pcard-head">
+      <div class="plogo">🌐</div>
+      <div class="pname-col">
+        <div class="pname">AGAM</div>
+        <div class="pbadges"><span class="pbadge sfin">FinTech · Micro-credit</span><span class="pbadge stage">Seed</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v nd">Not public</div></div>
+      <div class="pmet"><div class="pmet-l">Stage</div><div class="pmet-v" style="font-size:8.5px">Seed</div></div>
+      <div class="pmet"><div class="pmet-l">Geography</div><div class="pmet-v" style="font-size:8.5px">EM markets</div></div>
+    </div>
+    <div class="pdesc">Emerging market micro-credit platform. Provides small-ticket credit to underserved populations in emerging markets, using alternative data for credit scoring and mobile-first distribution channels.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><span class="pnote">Seed stage — no public disclosures. Contact Investa for latest update.</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── BioTech ─── -->
+<div class="psec-hdr">🧬 BioTech</div>
+<div class="pcards">
+
+  <!-- Altheia Tranche 1 -->
+  <div class="pcard sbio">
+    <div class="pcard-head">
+      <div class="plogo">🔬</div>
+      <div class="pname-col">
+        <div class="pname">Altheia — Tranche 1</div>
+        <div class="pbadges"><span class="pbadge sbio">BioTech</span><span class="pbadge stage">pre-Series A &nbsp;·&nbsp; Secondary</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v nd">Not public</div></div>
+      <div class="pmet"><div class="pmet-l">Entry type</div><div class="pmet-v" style="font-size:8.5px">Secondary (discount)</div></div>
+      <div class="pmet"><div class="pmet-l">Stage</div><div class="pmet-v" style="font-size:8.5px">pre-Series A</div></div>
+    </div>
+    <div class="pdesc">Biotech company. First of two Investa tranches, acquired as a secondary at a discount to primary pricing. Pre-Series A stage — company in early clinical or development phase. Details held internally.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><span class="pnote">Pre-Series A — no public disclosures. Contact Investa for latest update.</span></div>
+    </div>
+  </div>
+
+  <!-- Altheia Tranche 2 -->
+  <div class="pcard sbio">
+    <div class="pcard-head">
+      <div class="plogo">🔬</div>
+      <div class="pname-col">
+        <div class="pname">Altheia — Tranche 2</div>
+        <div class="pbadges"><span class="pbadge sbio">BioTech</span><span class="pbadge stage">pre-Series A &nbsp;·&nbsp; Secondary</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v nd">Not public</div></div>
+      <div class="pmet"><div class="pmet-l">Entry type</div><div class="pmet-v" style="font-size:8.5px">Secondary (discount)</div></div>
+      <div class="pmet"><div class="pmet-l">Stage</div><div class="pmet-v" style="font-size:8.5px">pre-Series A</div></div>
+    </div>
+    <div class="pdesc">Second Investa tranche in Altheia. Same company, different acquisition tranche — both entered as secondaries at a discount. Pre-Series A stage. Details held internally by Investa.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><span class="pnote">Pre-Series A — no public disclosures. Contact Investa for latest update.</span></div>
+    </div>
+  </div>
+
+  <!-- Arsenale -->
+  <div class="pcard sbio">
+    <div class="pcard-head">
+      <div class="plogo">🧪</div>
+      <div class="pname-col">
+        <div class="pname">Arsenale</div>
+        <div class="pbadges"><span class="pbadge sbio">BioTech · Bioreactors</span><span class="pbadge stage">Seed</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v nd">Not public</div></div>
+      <div class="pmet"><div class="pmet-l">Stage</div><div class="pmet-v" style="font-size:8.5px">Seed</div></div>
+      <div class="pmet"><div class="pmet-l">Focus</div><div class="pmet-v" style="font-size:8.5px">Bioreactors</div></div>
+    </div>
+    <div class="pdesc">Seed-stage bioreactor technology company. Developing next-generation biological manufacturing systems for pharmaceutical and industrial biotech applications.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><span class="pnote">Seed stage — no public disclosures. Contact Investa for latest update.</span></div>
+    </div>
+  </div>
+
+  <!-- NanoRetinal -->
+  <div class="pcard shlth">
+    <div class="pcard-head">
+      <div class="plogo">👁️</div>
+      <div class="pname-col">
+        <div class="pname">NanoRetinal</div>
+        <div class="pbadges"><span class="pbadge shlth">Healthcare · MedTech</span><span class="pbadge stage">Seed</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v nd">Not public</div></div>
+      <div class="pmet"><div class="pmet-l">Stage</div><div class="pmet-v" style="font-size:8.5px">Seed</div></div>
+      <div class="pmet"><div class="pmet-l">Indication</div><div class="pmet-v" style="font-size:8.5px">Retinal disease</div></div>
+    </div>
+    <div class="pdesc">Implantable nanodevices to restore vision in patients with retinal degenerative diseases including macular degeneration and retinitis pigmentosa — conditions with no current curative standard of care.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><span class="pnote">Seed stage — no public disclosures. Contact Investa for latest update.</span></div>
+    </div>
+  </div>
+
+  <!-- Mitral / Valcare Medical -->
+  <div class="pcard shlth">
+    <div class="pcard-head">
+      <div class="plogo">❤️</div>
+      <div class="pname-col">
+        <div class="pname">Mitral (Valcare Medical)</div>
+        <div class="pbadges"><span class="pbadge shlth">Healthcare · MedTech</span><span class="pbadge stage">Series B–C</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v nd">Not public</div></div>
+      <div class="pmet"><div class="pmet-l">Stage</div><div class="pmet-v" style="font-size:8.5px">Series B–C</div></div>
+      <div class="pmet"><div class="pmet-l">Indication</div><div class="pmet-v" style="font-size:8.5px">Heart failure</div></div>
+    </div>
+    <div class="pdesc">MedTech pioneering the first clinically validated mitral annuloplasty ring for minimally invasive valve repair — replicating the surgical gold standard via catheter-based delivery for non-surgical heart failure patients.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><a href="https://valcaremedical.com" target="_blank">Visit valcaremedical.com for clinical trial and regulatory updates</a></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── Industrial ─── -->
+<div class="psec-hdr">🏭 Industrial</div>
+<div class="pcards">
+
+  <!-- Rise -->
+  <div class="pcard sind">
+    <div class="pcard-head">
+      <div class="plogo">🚌</div>
+      <div class="pname-col">
+        <div class="pname">Rise</div>
+        <div class="pbadges"><span class="pbadge sind">Industrial · EV Mobility</span><span class="pbadge stage">Seed</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v nd">Not public</div></div>
+      <div class="pmet"><div class="pmet-l">Stage</div><div class="pmet-v" style="font-size:8.5px">Seed</div></div>
+      <div class="pmet"><div class="pmet-l">Market</div><div class="pmet-v" style="font-size:8.5px">City transport</div></div>
+    </div>
+    <div class="pdesc">EV mobility solution targeting city transport operators. Developing electric fleet systems to decarbonise urban public transportation networks through integrated hardware and software platforms.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><span class="pnote">Seed stage — no public disclosures. Contact Investa for latest update.</span></div>
+    </div>
+  </div>
+
+  <!-- Metamorphosies -->
+  <div class="pcard sind">
+    <div class="pcard-head">
+      <div class="plogo">🔋</div>
+      <div class="pname-col">
+        <div class="pname">Metamorphosies</div>
+        <div class="pbadges"><span class="pbadge sind">Industrial · Energy Storage</span><span class="pbadge stage">Seed</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v nd">Not public</div></div>
+      <div class="pmet"><div class="pmet-l">Stage</div><div class="pmet-v" style="font-size:8.5px">Seed (planning)</div></div>
+      <div class="pmet"><div class="pmet-l">Focus</div><div class="pmet-v" style="font-size:8.5px">Energy storage</div></div>
+    </div>
+    <div class="pdesc">Energy storage company in early planning and development. Working on next-generation storage solutions to support grid-scale renewables integration and industrial energy management.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><span class="pnote">Early seed — no public disclosures. Contact Investa for latest update.</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── Energy ─── -->
+<div class="psec-hdr">⚛️ Energy</div>
+<div class="pcards">
+
+  <!-- Newcleo -->
+  <div class="pcard snrg">
+    <div class="pcard-head">
+      <div class="plogo"><img src="https://logo.clearbit.com/newcleo.com" onerror="this.innerHTML='☢️'" alt=""></div>
+      <div class="pname-col">
+        <div class="pname"><a href="https://newcleo.com" target="_blank">Newcleo</a></div>
+        <div class="pbadges"><span class="pbadge snrg">Energy · Nuclear SMR</span><span class="pbadge stage">Series A</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v">£1.29B</div></div>
+      <div class="pmet"><div class="pmet-l">Total Raised</div><div class="pmet-v">$763M+</div></div>
+      <div class="pmet"><div class="pmet-l">Latest Round</div><div class="pmet-v" style="font-size:8.5px">$85M Feb 2026</div></div>
+    </div>
+    <div class="pdesc">European lead-cooled fast reactor (LFR) using reprocessed nuclear waste as fuel. $85M raise closed Feb 4 2026; $125M+ raised in 2025. Licence applications in France by end 2027. JV with Slovakia's JAVYS for 4×200MWe. Partnership with Oklo for US fuel ecosystem.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><a href="https://finance.yahoo.com/news/newcleo-raises-over-usd-125-120000470.html" target="_blank">newcleo raises $125M+ in 2025; $85M round closed Feb 2026</a><span class="psrc">Globe Newswire</span></div>
+    </div>
+  </div>
+
+  <!-- Afterwind -->
+  <div class="pcard sclim">
+    <div class="pcard-head">
+      <div class="plogo">🌀</div>
+      <div class="pname-col">
+        <div class="pname">Afterwind Potential</div>
+        <div class="pbadges"><span class="pbadge sclim">Climate Tech · Recycling</span><span class="pbadge stage">Seed</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v nd">Not public</div></div>
+      <div class="pmet"><div class="pmet-l">Stage</div><div class="pmet-v" style="font-size:8.5px">Seed</div></div>
+      <div class="pmet"><div class="pmet-l">Focus</div><div class="pmet-v" style="font-size:8.5px">Wind blade recycling</div></div>
+    </div>
+    <div class="pdesc">Climate tech addressing the end-of-life problem for wind turbine blades — composite materials largely incompatible with conventional recycling. Developing circular solutions to recover value from decommissioned turbines at scale.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><span class="pnote">Seed stage — no public disclosures. Contact Investa for latest update.</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── Deep Tech / IT ─── -->
+<div class="psec-hdr">🔬 Deep Tech &amp; IT</div>
+<div class="pcards">
+
+  <!-- V-Nova -->
+  <div class="pcard sdeep">
+    <div class="pcard-head">
+      <div class="plogo"><img src="https://logo.clearbit.com/v-nova.com" onerror="this.innerHTML='📹'" alt=""></div>
+      <div class="pname-col">
+        <div class="pname"><a href="https://v-nova.com" target="_blank">V-Nova</a></div>
+        <div class="pbadges"><span class="pbadge sdeep">DeepTech · Video / IP</span><span class="pbadge stage">Series C+</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Total Raised</div><div class="pmet-v">$67.3M</div></div>
+      <div class="pmet"><div class="pmet-l">Last Round</div><div class="pmet-v" style="font-size:8.5px">$38.8M (2021)</div></div>
+      <div class="pmet"><div class="pmet-l">2024 Revenue</div><div class="pmet-v">$10.8M</div></div>
+    </div>
+    <div class="pdesc">Advanced video compression and data encoding technologies. Creator of MPEG-5 LCEVC and VC-6 standards (ISO/SMPTE). Brazil adopted LCEVC in national DTV+ standard Aug 2025 — first BRICS country. 1,000+ patents. Partners: Sky, NVIDIA, AWS, Eutelsat.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><a href="https://en.wikipedia.org/wiki/V-NOVA" target="_blank">V-Nova LCEVC adopted in Brazil national TV 3.0 DTV+ standard (Aug 2025)</a><span class="psrc">Wikipedia</span></div>
+    </div>
+  </div>
+
+  <!-- Pasqal -->
+  <div class="pcard sit">
+    <div class="pcard-head">
+      <div class="plogo"><img src="https://logo.clearbit.com/pasqal.com" onerror="this.innerHTML='⚛'" alt=""></div>
+      <div class="pname-col">
+        <div class="pname"><a href="https://pasqal.com" target="_blank">Pasqal</a></div>
+        <div class="pbadges"><span class="pbadge sit">IT · Quantum Computing</span><span class="pbadge stage">Seed → Series C (talks)</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Target Val.</div><div class="pmet-v">$1B+</div></div>
+      <div class="pmet"><div class="pmet-l">Raise (talks)</div><div class="pmet-v" style="font-size:8.5px">€200M Series C</div></div>
+      <div class="pmet"><div class="pmet-l">Raised to date</div><div class="pmet-v">~€150M</div></div>
+    </div>
+    <div class="pdesc">French neutral-atom quantum computing. Co-founded by 2022 Nobel Laureate Alain Aspect. In talks (Feb 2026) to raise €200M at $1B+ unicorn valuation. Full-stack hardware + software + cloud. Investors: Temasek, Bpifrance, Saudi Aramco's Wa'ed Ventures, LG Electronics.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><a href="https://thequantuminsider.com/2026/02/19/pasqal-in-talks-to-raise-e200m-at-unicorn-valuation-bloomberg-reports/" target="_blank">Pasqal in talks to raise €200M at $1B+ unicorn valuation (Feb 2026)</a><span class="psrc">The Quantum Insider</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── Real Estate ─── -->
+<div class="psec-hdr">🏟️ Real Estate</div>
+<div class="pcards">
+
+  <!-- Leipzig Stadium -->
+  <div class="pcard sre">
+    <div class="pcard-head">
+      <div class="plogo">🏟️</div>
+      <div class="pname-col">
+        <div class="pname">Leipzig Stadium</div>
+        <div class="pbadges"><span class="pbadge sre">Real Estate · Sports</span><span class="pbadge stage">Growth</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v nd">Not public</div></div>
+      <div class="pmet"><div class="pmet-l">Stage</div><div class="pmet-v" style="font-size:8.5px">Growth</div></div>
+      <div class="pmet"><div class="pmet-l">Asset type</div><div class="pmet-v" style="font-size:8.5px">Stadium / Events</div></div>
+    </div>
+    <div class="pdesc">Sports and events management investment tied to Leipzig stadium infrastructure. Growth-stage real estate with revenue driven by stadium utilisation, events programming, and ancillary commercial rights.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><span class="pnote">No public disclosures. Contact Investa for latest update.</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── Consumer & E-Commerce ─── -->
+<div class="psec-hdr">🛍️ Consumer &amp; E-Commerce</div>
+<div class="pcards">
+
+  <!-- Project Marie -->
+  <div class="pcard scon">
+    <div class="pcard-head">
+      <div class="plogo">🥨</div>
+      <div class="pname-col">
+        <div class="pname">Project Marie (Lucid III)</div>
+        <div class="pbadges"><span class="pbadge scon">Consumer · Retail</span><span class="pbadge stage">Late Stage</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v nd">Not public</div></div>
+      <div class="pmet"><div class="pmet-l">Stage</div><div class="pmet-v" style="font-size:8.5px">Late Stage</div></div>
+      <div class="pmet"><div class="pmet-l">Stores</div><div class="pmet-v">40+</div></div>
+    </div>
+    <div class="pdesc">Leading retailer of traditional Bavarian dress (Tracht), operating 40+ stores and online platforms. Dominant brand in a niche cultural fashion segment with strong repeat purchase rates and pronounced seasonal demand.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><span class="pnote">No public disclosures. Contact Investa for latest update.</span></div>
+    </div>
+  </div>
+
+  <!-- Canva -->
+  <div class="pcard secom">
+    <div class="pcard-head">
+      <div class="plogo"><img src="https://logo.clearbit.com/canva.com" onerror="this.innerHTML='🎨'" alt=""></div>
+      <div class="pname-col">
+        <div class="pname"><a href="https://canva.com" target="_blank">Canva</a></div>
+        <div class="pbadges"><span class="pbadge secom">E-commerce · Design SaaS</span><span class="pbadge stage">Pre-IPO</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v">$42B</div></div>
+      <div class="pmet"><div class="pmet-l">ARR (2025)</div><div class="pmet-v">$4B</div></div>
+      <div class="pmet"><div class="pmet-l">Users (MAU)</div><div class="pmet-v">265M</div></div>
+    </div>
+    <div class="pdesc">Graphic design and creative tools platform. $4B ARR end 2025 (+35% YoY); B2B $500M ARR growing 100%. 31M paid users. Employee share sale at $42B (Aug 2025). Blackbird told LPs H2 2026 IPO-ready. LLM referral traffic in double digits.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><a href="https://techcrunch.com/2026/02/18/canva-gets-to-4b-in-revenue-as-llm-referral-traffic-rises/" target="_blank">Canva reaches $4B ARR; LLM referral traffic now double-digit %</a><span class="psrc">TechCrunch</span></div>
+      <div class="pnews-row"><div class="pnews-dot"></div><a href="https://www.capitalbrief.com/newsletter/canva-ready-for-2026-ipo-blackbird-tells-lps-98afee39-26d0-40de-ad53-7ef193d2d3c3/" target="_blank">Canva ready for 2026 IPO — Blackbird tells LPs</a><span class="psrc">Capital Brief</span></div>
+    </div>
+  </div>
+
+  <!-- Shop Circle -->
+  <div class="pcard secom">
+    <div class="pcard-head">
+      <div class="plogo"><img src="https://logo.clearbit.com/shopcircle.co" onerror="this.innerHTML='🛒'" alt=""></div>
+      <div class="pname-col">
+        <div class="pname"><a href="https://shopcircle.co" target="_blank">Shopcircle</a></div>
+        <div class="pbadges"><span class="pbadge secom">E-commerce · B2B SaaS</span><span class="pbadge stage">Series B+</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Total Raised</div><div class="pmet-v">$283M</div></div>
+      <div class="pmet"><div class="pmet-l">Last Round</div><div class="pmet-v" style="font-size:8.5px">$100M (Sep 2025)</div></div>
+      <div class="pmet"><div class="pmet-l">2025 Revenue</div><div class="pmet-v">$43.3M</div></div>
+    </div>
+    <div class="pdesc">AI-native B2B SaaS platform for e-commerce operators. 16 acquisitions in 4 years. Series B extended to $100M (Sep 2025), backed by Nextalia, CDP Venture Capital. KrakenD API gateway acquired Aug 2025. Revenue +110% YoY. UK Future Fifty listed.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><a href="https://shopcircle.co/blogs/acquire/series-b-extension" target="_blank">Shop Circle extends Series B to $100M — 4 rounds at progressively higher valuations</a><span class="psrc">Shopcircle</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── Agriculture ─── -->
+<div class="psec-hdr">🌾 Agriculture</div>
+<div class="pcards">
+
+  <!-- Fyeld (Pomos) -->
+  <div class="pcard sagri">
+    <div class="pcard-head">
+      <div class="plogo">🚜</div>
+      <div class="pname-col">
+        <div class="pname">Fyeld (Pomos)</div>
+        <div class="pbadges"><span class="pbadge sagri">Agriculture · Agri-tech</span><span class="pbadge stage">Late Stage</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v nd">Not public</div></div>
+      <div class="pmet"><div class="pmet-l">Stage</div><div class="pmet-v" style="font-size:8.5px">Late Stage</div></div>
+      <div class="pmet"><div class="pmet-l">Sector</div><div class="pmet-v" style="font-size:8.5px">Agri machinery</div></div>
+    </div>
+    <div class="pdesc">Agricultural machinery company (operating as Pomos) at late stage. Develops and distributes advanced farming equipment and automation technology to improve productivity and reduce costs for large-scale agricultural operators.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><span class="pnote">No public disclosures. Contact Investa for latest update.</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── Space ─── -->
+<div class="psec-hdr">🚀 Space</div>
+<div class="pcards">
+
+  <!-- SpaceX -->
+  <div class="pcard sspc">
+    <div class="pcard-head">
+      <div class="plogo"><img src="https://logo.clearbit.com/spacex.com" onerror="this.innerHTML='🚀'" alt=""></div>
+      <div class="pname-col">
+        <div class="pname"><a href="https://spacex.com" target="_blank">SpaceX</a></div>
+        <div class="pbadges"><span class="pbadge sspc">Space · Aerospace</span><span class="pbadge stage">Pre-IPO</span></div>
+      </div>
+    </div>
+    <div class="pmets">
+      <div class="pmet"><div class="pmet-l">Valuation</div><div class="pmet-v">$800B</div></div>
+      <div class="pmet"><div class="pmet-l">IPO target</div><div class="pmet-v" style="font-size:8.5px">2026 / ~$1.5T</div></div>
+      <div class="pmet"><div class="pmet-l">Est. Revenue</div><div class="pmet-v" style="font-size:8.5px">~$15B (2025)</div></div>
+    </div>
+    <div class="pdesc">Dominant launch vehicle and satellite internet company. Secondary at $800B (Dec 2025, $421/share). IPO 2026 targeting ~$1.5T. Merged with xAI Feb 2026. Starlink: 9.2M subscribers, 7,000+ satellites. 165 Falcon 9 launches in 2025 — over half of all global orbital launches.</div>
+    <div class="pnews">
+      <div class="pnews-row"><div class="pnews-dot"></div><a href="https://fortune.com/2025/12/13/spacex-ipo-plan-2026-secondary-offering-insider-share-sale-800-billion-valuation/" target="_blank">SpaceX sets $800B valuation, confirms 2026 IPO plans</a><span class="psrc">Fortune</span></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="pdisclaim">
+  ⚠️ &nbsp;VALUATIONS are last-known private market figures sourced from public media reports of confirmed funding rounds or secondary transactions. They do not represent fair value, offer price, or Investa's internal carrying value. Klarna is now listed on NYSE (KLAR) — see public markets for live pricing. Companies marked "Not public" are early-stage with no published valuation data. This page is for internal reference only and does not constitute investment advice.
+</div>
+
+</div>
+</div>
+<!-- END PORTFOLIO PAGE -->
+
+</div><!-- #content -->
+
+<!-- FOOTER -->
+<div id="ftr">
+  <span>INVESTA SOLUTIONS SA · EOD data Sat 28 Mar 2026 · Sources: Yahoo Finance, Trading Economics, Investing.com, Reuters · Credit: ETF price proxies (LQD/HYG/IEAC/IHYG/EMB)</span>
+  <span id="fdate"></span>
+</div>
+
+<script>
+'use strict';
+
+// Clock
+(function tick(){
+  document.getElementById('clk').textContent =
+    new Date().toLocaleTimeString('en-GB',{timeZone:'Europe/Zurich',hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'})+' CET';
+  setTimeout(tick,1000);
+})();
+document.getElementById('fdate').textContent =
+  new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+// Tabs
+function go(id, el){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('on');
+  el.classList.add('active');
+}
+
+// Sparkline
+function spark(vals, pos){
+  if(!vals||vals.length<2) return '';
+  const W=54,H=17,P=1.5;
+  const mn=Math.min(...vals), mx=Math.max(...vals), rng=mx-mn||1;
+  const pts = vals.map((v,i) => {
+    const x = P+(i/(vals.length-1))*(W-2*P);
+    const y = H-P-((v-mn)/rng)*(H-2*P);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  const last = pts.split(' ').pop().split(',');
+  const c = pos===null?'#485468':pos?'#00b87a':'#e8334a';
+  return `<svg width="${W}" height="${H}" style="vertical-align:middle"><polyline points="${pts}" fill="none" stroke="${c}" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${parseFloat(last[0]).toFixed(1)}" cy="${parseFloat(last[1]).toFixed(1)}" r="1.8" fill="${c}"/></svg>`;
+}
+
+const fmt = (v, d=2) => v==null||isNaN(v) ? '—' : Number(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const pct = (v, d=2) => {
+  if(v==null||isNaN(v)) return '<span class="d">—</span>';
+  return `<span class="${v>0?'g':v<0?'r':'d'}">${v>0?'+':''}${Number(v).toFixed(d)}%</span>`;
+};
+
+// ── EOD DATA — Tuesday 03 March 2026 ──────────────────────────────
+// S&P 500 close 6,816.63 per CNBC; Nasdaq 22,516.69; Dow 48,501.27
+// DAX 23,765 / FTSE 10,780 / Nikkei 56,279 — all confirmed Yahoo Finance
+// WTI $74.56 / Brent $81.40 — confirmed CNBC
+// US 10Y 4.10% — confirmed Trading Economics
+// EUR/USD 1.1597 / USD/JPY 157.38 / USD/CHF 0.7816 — confirmed Yahoo Finance
+const D = {
+  // EOD data — 28 Mar 2026 | Sources: Yahoo Finance, Trading Economics, Investing.com, Middle East Insider
+  eq:[
+    {l:'S&P 500',       v:6369,  d:-109, dp:-1.67, y:-6.3,  y1:+13.4, dec:0, s:[6581,6720,6650,6581,6453,6369]},
+    {l:'Nasdaq 100',    v:20948, d:-461, dp:-2.15, y:-8.8,  y1:+8.2,  dec:0, s:[21947,22400,22100,21947,21400,20948]},
+    {l:'Euro Stoxx 50', v:5506,  d:-60,  dp:-1.08, y:-3.2,  y1:+8.4,  dec:0, s:[5740,5680,5620,5580,5560,5506]},
+    {l:'DAX',           v:22301, d:-312, dp:-1.38, y:-1.2,  y1:+9.8,  dec:0, s:[23765,23400,23100,22800,22612,22301]},
+    {l:'FTSE 100',      v:9967,  d:-5,   dp:-0.05, y:+0.2,  y1:+14.6, dec:0, s:[10780,10600,10400,10200,10050,9967]},
+    {l:'Nikkei 225',    v:53373, d:-232, dp:-0.43, y:+9.4,  y1:+21.2, dec:0, s:[56279,55800,55200,54500,53605,53373]},
+    {l:'SMI',           v:12640, d:-120, dp:-0.94, y:+3.1,  y1:+8.2,  dec:0, s:[12980,12850,12760,12700,12660,12640]},
+    {l:'Hang Seng',     v:24952, d:+95,  dp:+0.38, y:+14.9, y1:+20.1, dec:0, s:[25768,25400,25100,24800,24857,24952]},
+    {l:'MSCI EM (EEM)', v:44.85, d:-0.62,dp:-1.36, y:+4.2,  y1:+9.8,  dec:2, s:[46.20,45.80,45.40,45.10,44.95,44.85]},
+  ],
+  rt:[
+    // Sources: Trading Economics 28 Mar 2026
+    {l:'US 10Y',      v:4.42, d1:+0.01, yb:+46, y1:+32.0, s:[4.10,4.20,4.28,4.35,4.41,4.42]},
+    {l:'US 2Y',       v:3.96, d1:+0.60, yb:+16, y1:+0.8,  s:[3.93,3.90,3.88,3.92,3.96,3.96]},
+    {l:'DE 10Y Bund', v:2.72, d1:+0.04, yb:+57, y1:+38.1, s:[2.52,2.55,2.60,2.65,2.68,2.72]},
+    {l:'UK 10Y Gilt', v:4.88, d1:+0.05, yb:+40, y1:+9.0,  s:[4.72,4.75,4.78,4.82,4.83,4.88]},
+    {l:'JP 10Y JGB',  v:2.68, d1:+0.03, yb:+61, y1:+110.2,s:[2.55,2.58,2.61,2.64,2.65,2.68]},
+    {l:'IT 10Y BTP',  v:3.96, d1:+0.06, yb:+46, y1:+13.5, s:[3.72,3.76,3.82,3.88,3.90,3.96]},
+    {l:'CH 10Y',      v:0.54, d1:+0.02, yb:+24, y1:+107.7,s:[0.42,0.44,0.47,0.50,0.52,0.54]},
+  ],
+  fx:[
+    // USD firming on war/inflation; EUR surrendering early-2026 gains (MUFG/RBC March 2026)
+    {l:'EUR/USD', v:1.1050, dp:-0.48, y:+9.0,  y1:+6.4,  s:[1.1597,1.145,1.132,1.118,1.108,1.1050]},
+    {l:'GBP/USD', v:1.2940, dp:-0.58, y:+2.5,  y1:+3.2,  s:[1.3314,1.320,1.310,1.302,1.297,1.2940]},
+    {l:'USD/JPY', v:150.20, dp:-0.45, y:-4.6,  y1:-4.9,  s:[157.38,156.5,154.8,152.4,151.0,150.20]},
+    {l:'USD/CHF', v:0.8320, dp:+0.62, y:-12.0, y1:-12.5, s:[0.7816,0.792,0.806,0.818,0.826,0.8320]},
+    {l:'AUD/USD', v:0.6720, dp:-0.62, y:+2.1,  y1:+1.0,  s:[0.6999,0.692,0.685,0.680,0.676,0.6720]},
+    {l:'USD/CAD', v:1.3580, dp:-0.08, y:-6.0,  y1:-3.0,  s:[1.3691,1.365,1.362,1.360,1.359,1.3580]},
+    {l:'NZD/USD', v:0.6180, dp:-0.48, y:+2.5,  y1:+1.0,  s:[0.6382,0.632,0.626,0.622,0.620,0.6180]},
+    {l:'EUR/CHF', v:0.9198, dp:+0.15, y:-3.5,  y1:-5.5,  s:[0.9064,0.908,0.912,0.916,0.918,0.9198]},
+    {l:'EUR/GBP', v:0.8539, dp:+0.10, y:+6.2,  y1:+3.1,  s:[0.8710,0.868,0.864,0.860,0.857,0.8539]},
+  ],
+  co:[
+    // Gold ~$4,422 Yahoo Finance 28 Mar; war-driven selloff from $5,075 (gold/war disconnect noted)
+    {l:'Gold',        v:4422,  u:'USD/oz',    dec:0, dp:+1.06, y:-3.0,  y1:+39.5, s:[5075,4850,4600,4450,4376,4422]},
+    {l:'Silver',      v:32.80, u:'USD/oz',    dec:2, dp:-0.60, y:-51.2, y1:-34.5, s:[91.40,75.0,55.0,40.0,33.0,32.80]},
+    // WTI $99.64 confirmed Investing.com 28 Mar; Brent $112.57 Middle East Insider 28 Mar
+    {l:'WTI Crude',   v:99.64, u:'USD/bbl',   dec:2, dp:+5.46, y:+73.4, y1:+80.6, s:[74.56,80.0,86.5,91.2,94.48,99.64]},
+    {l:'Brent Crude', v:112.57,u:'USD/bbl',   dec:2, dp:+4.22, y:+72.0, y1:+79.8, s:[81.40,87.5,94.0,104.0,108.01,112.57]},
+    {l:'Natural Gas', v:5.52,  u:'USD/MMBtu', dec:2, dp:+29.5, y:+49.7, y1:+72.1, s:[3.25,3.80,4.25,4.26,4.26,5.52]},
+    {l:'Copper',      v:4.712, u:'USD/lb',    dec:3, dp:+0.48, y:+10.6, y1:+14.8, s:[4.25,4.42,4.55,4.65,4.68,4.712]},
+    // VIX 31.05 Yahoo Finance 28 Mar (+13.16%)
+    {l:'VIX',         v:31.05, u:'pts',       dec:2, dp:+13.16,y:+66.3, y1:+48.2, s:[21.44,23.0,25.5,27.5,27.44,31.05]},
+    // Bitcoin $69,038 Yahoo Finance 28 Mar (-2.40%)
+    {l:'Bitcoin',     v:69038, u:'USD',       dec:0, dp:-2.40, y:-8.8,  y1:+52.6, s:[67250,68000,70500,71000,70735,69038]},
+  ],
+  cr:[
+    // Credit ETFs under pressure from rates repricing + oil shock
+    {l:'US IG — LQD',  v:103.20, dp:-0.82, y:-3.5, y1:+0.4, s:[105.40,105.0,104.5,104.0,103.6,103.20]},
+    {l:'US HY — HYG',  v:74.90,  dp:-1.08, y:-4.8, y1:+2.8, s:[76.80,76.4,75.8,75.4,75.1,74.90]},
+    {l:'EUR IG — IEAC', v:108.60, dp:-0.62, y:-2.4, y1:+1.8, s:[110.20,109.8,109.4,109.0,108.8,108.60]},
+    {l:'EUR HY — IHYG', v:85.10,  dp:-0.80, y:-1.6, y1:+5.2, s:[86.90,86.5,86.0,85.8,85.4,85.10]},
+    {l:'EM Sov — EMB',  v:85.80,  dp:-0.68, y:+0.6, y1:+5.8, s:[87.35,87.0,86.6,86.2,86.0,85.80]},
+  ]
+};
+
+function render(d){
+  // Equities
+  document.getElementById('tb-eq').innerHTML = d.eq.map(r => {
+    const dc = r.d>0?'g':r.d<0?'r':'d';
+    return `<tr class="fl"><td>${r.l}</td><td>${fmt(r.v,r.dec)}</td>
+      <td><span class="${dc}">${r.d>0?'+':''}${fmt(r.d,r.dec)}</span></td>
+      <td>${pct(r.dp)}</td><td>${pct(r.y)}</td><td>${pct(r.y1)}</td>
+      <td>${spark(r.s, r.dp>=0)}</td></tr>`;
+  }).join('');
+
+  // Rates
+  document.getElementById('tb-rt').innerHTML = d.rt.map(r => {
+    const bp = Math.round(r.d1*100), yb = Math.round(r.yb||0);
+    const dc = bp>0?'r':bp<0?'g':'d';  // inverted: rising yield = red
+    const yc = yb>0?'r':yb<0?'g':'d';
+    const y1c = r.y1>0?'r':r.y1<0?'g':'d';
+    return `<tr class="fl"><td>${r.l}</td>
+      <td>${fmt(r.v,3)}%</td>
+      <td><span class="${dc}">${bp>0?'+':''}${bp}bp</span></td>
+      <td><span class="${yc}">${yb>0?'+':''}${yb}bp</span></td>
+      <td><span class="${y1c}">${r.y1>0?'+':''}${Number(r.y1).toFixed(1)}%</span></td>
+      <td>${spark(r.s, r.d1<=0)}</td></tr>`;
+  }).join('');
+
+  // FX
+  document.getElementById('tb-fx').innerHTML = d.fx.map(r => `
+    <tr class="fl"><td>${r.l}</td><td>${fmt(r.v,4)}</td>
+    <td>${pct(r.dp)}</td><td>${pct(r.y)}</td><td>${pct(r.y1)}</td>
+    <td>${spark(r.s, r.dp>=0)}</td></tr>`).join('');
+
+  // Commodities
+  document.getElementById('tb-co').innerHTML = d.co.map(r => `
+    <tr class="fl"><td>${r.l}</td><td>${fmt(r.v,r.dec)}</td>
+    <td class="unit">${r.u}</td>
+    <td>${pct(r.dp)}</td><td>${pct(r.y)}</td><td>${pct(r.y1)}</td>
+    <td>${spark(r.s, r.dp>=0)}</td></tr>`).join('');
+
+  // Credit
+  document.getElementById('tb-cr').innerHTML = d.cr.map(r => `
+    <tr class="fl"><td>${r.l}</td><td>${fmt(r.v,2)}</td>
+    <td>${pct(r.dp)}</td><td>${pct(r.y)}</td><td>${pct(r.y1)}</td>
+    <td>${spark(r.s, r.dp>=0)}</td></tr>`).join('');
+
+  // Ticker
+  const items = [
+    ...d.eq.slice(0,5),
+    ...d.fx.slice(0,3),
+    ...d.co.filter(x=>['Gold','WTI Crude','Bitcoin','VIX'].includes(x.l))
+  ];
+  const tick = items.map(it => {
+    const p = Number(it.v).toLocaleString('en-US',{maximumFractionDigits:it.dec??2,minimumFractionDigits:0});
+    const c = (it.dp??it.d1??0)>=0;
+    const pv = it.dp??((it.d1/it.v)*100);
+    return `<div class="ti"><span class="tiname">${it.l}</span><span class="tiprice">${p}</span><span class="${c?'g':'r'}">${c?'+':''}${Number(pv).toFixed(2)}%</span></div>`;
+  }).join('');
+  document.getElementById('tinner').innerHTML = tick + tick;
+}
+
+// AI Refresh
+render(D);
+</script>
+</body>
+</html>
